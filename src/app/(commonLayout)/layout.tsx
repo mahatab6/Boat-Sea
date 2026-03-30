@@ -1,3 +1,4 @@
+import Footer from "@/components/shared/footer";
 import Navbar from "@/components/shared/navbar";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 
@@ -19,6 +20,7 @@ export default function CommonLayout({
         <main className="flex-1">
           {children}
         </main>
+        <Footer/>
       </div>
     </ThemeProvider>
   );
