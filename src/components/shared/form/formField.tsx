@@ -4,8 +4,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { AnyFieldApi } from "@tanstack/react-form-nextjs";
-
+import type { AnyFieldApi } from "@tanstack/react-form";
 /**
  * Safely extracts error strings from TanStack Form's error state
  */

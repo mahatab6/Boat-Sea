@@ -1,15 +1,19 @@
-import LoingForm from "@/components/modules/auth/LoingForm";
-import React from "react";
+import LoginForm from "@/components/modules/auth/LoginForm";
+
 
 interface LoginParams {
-  searchParams: Promise<{ redirect?: string }>;
+  searchParams: Promise<{redirect?:string}>
 }
 
-const LoginPage = async ({ searchParams }: LoginParams) => {
+
+const LoginPage = async ({searchParams} : LoginParams ) => {
+ 
   const params = await searchParams;
   const redirectPath = params.redirect;
 
-  return <LoingForm redirectPath={redirectPath} />;
-};
+  return (
+    <LoginForm redirectPath={redirectPath}/>
+  )
+}
 
-export default LoginPage;
+export default LoginPage
