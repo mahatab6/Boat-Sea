@@ -150,7 +150,7 @@ const Navbar = () => {
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full justify-start">Login</Button>
                   </Link>
-                  <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full justify-start">Register</Button>
                   </Link>
                 </div>
