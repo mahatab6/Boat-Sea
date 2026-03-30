@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { LoginAction } from "@/app/(commonLayout)/(authRoute)/login/_action";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
 interface LoginFormProps {
@@ -128,7 +129,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
 
               {/* Remember Me */}
               <div className="flex items-center space-x-2 py-1">
-                {/* <Checkbox id="remember" className="rounded-sm border-muted-foreground" /> */}
+                <Checkbox id="remember" className="rounded-sm border-muted-foreground" />
                 <Label 
                   htmlFor="remember" 
                   className="text-sm font-normal cursor-pointer text-muted-foreground select-none"
@@ -146,7 +147,6 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                 </Alert>
               )}
 
-              {/* Submit Button using your AppSubmitButtont */}
               <form.Subscribe
                 selector={(s) => [s.canSubmit, s.isSubmitting] as const}
               >

@@ -104,7 +104,7 @@ const Navbar = () => {
                     Login
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/register">
                   <Button className="rounded-full">Register</Button>
                 </Link>
               </div>
