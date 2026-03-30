@@ -3,11 +3,12 @@ import Testimonials from "./testimonials";
 import HowItWorks from "./howItWorks";
 import PopularRoutes from "./popularRoutes";
 import FeaturedBoat from "./featuredBoat";
+import Hero from "./hero";
 
 const HomePage = () => {
   return (
     <main>
-      <h2>Home page</h2>
+      <Hero/>
       <FeaturedBoat/>
       <PopularRoutes/>
       <HowItWorks/>
