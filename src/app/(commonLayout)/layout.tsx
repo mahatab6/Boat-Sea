@@ -1,4 +1,6 @@
 import Navbar from "@/components/shared/navbar";
+import { ThemeProvider } from "@/components/shared/theme-provider";
+
 
 export default function CommonLayout({
   children,
@@ -6,9 +8,18 @@ export default function CommonLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <Navbar />
-      {children}
-    </>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div className="relative flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }

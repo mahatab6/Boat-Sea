@@ -10,14 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, User } from "lucide-react";
+import { Search, User, Menu, X } from "lucide-react"; 
 import { useState } from "react";
+import { ModeToggle } from "./toggle";
 
 const Navbar = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  
   const isAuthenticated = false; 
   const currentUser = { name: "User" };
   const logout = () => console.log("Logged out");
@@ -36,6 +36,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
+          
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
@@ -67,7 +68,7 @@ const Navbar = () => {
               <Search className="w-5 h-5" />
             </Button>
 
-            {/* <ModeToggle /> */}
+            <ModeToggle />
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
@@ -77,7 +78,8 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <DropdownMenu>
-                  <DropdownMenuTrigger >
+                  {/* CRITICAL: Added asChild here to fix nesting error */}
+                  <DropdownMenuTrigger > 
                     <Button variant="ghost" size="icon" className="rounded-full">
                       <User className="w-5 h-5" />
                     </Button>
@@ -109,15 +111,24 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Toggle */}
-          {/* <div className="flex items-center md:hidden">
+          {/* Mobile Screen Controls */}
+          <div className="flex items-center space-x-2 md:hidden">
             <ModeToggle />
-          </div> */}
+            
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="rounded-lg"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Menu Content */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-in slide-in-from-top-2">
+          <div className="md:hidden py-4 border-t border-border bg-background animate-in slide-in-from-top-2">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 <Link
@@ -127,20 +138,20 @@ const Navbar = () => {
                   className={`px-4 py-2 rounded-lg text-sm font-medium ${
                     isActive(link.path)
                       ? "text-primary bg-primary/10"
-                      : "text-foreground/80"
+                      : "text-foreground/80 hover:bg-muted"
                   }`}
                 >
                   {link.name}
                 </Link>
               ))}
-              <hr className="my-2 border-border" />
+              <hr className="my-2 border-border mx-4" />
               {!isAuthenticated && (
-                <div className="flex flex-col space-y-2 p-2">
+                <div className="flex flex-col space-y-2 px-4">
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Login</Button>
+                    <Button variant="outline" className="w-full justify-start">Login</Button>
                   </Link>
                   <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Register</Button>
+                    <Button className="w-full justify-start">Register</Button>
                   </Link>
                 </div>
               )}
