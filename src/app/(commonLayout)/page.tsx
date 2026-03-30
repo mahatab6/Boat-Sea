@@ -1,8 +1,9 @@
+import HomePage from '@/components/modules/homePage/homePage'
 import React from 'react'
 
 const CommonLayoutpage = () => {
   return (
-    <div>CommonLayoutpage</div>
+    <HomePage/>
   )
 }
 

@@ -42,7 +42,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-muted/30 text-muted-foreground border-t border-border mt-auto">
+    <footer className="w-full bg-muted text-muted-foreground border-t border-border mt-auto ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         
         {/* Top Section: Links Grid */}
