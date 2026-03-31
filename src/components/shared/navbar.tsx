@@ -3,26 +3,30 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { User, Menu, X } from "lucide-react";
+import {  Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "./toggle";
-import { useUser } from "@/hooks/useUser";
+import logoutAction from "../modules/auth/logoutAction";
 
-const Navbar = () => {
+interface useActiveProps {
+  userActive: boolean
+}
+
+const Navbar = (userActive : useActiveProps) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { user }: any = useUser();
-  const isAuthenticated = !!user?.email;
-  const logout = () => console.log("Logged out");
+ 
+  const isAuthenticated = userActive;
+
+  const handleLogout = async () => {
+      const result = await logoutAction();
+      if (result.success) {
+        redirect("/");
+      }
+  };
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -76,32 +80,6 @@ const Navbar = () => {
                 <Button variant="outline" className="rounded-full" asChild >
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full"
-                      asChild
-                    >
-                      <User className="w-5 h-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem className="font-medium text-primary">
-                      {user?.name}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/dashboard">My Bookings</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={logout}
-                      className="text-destructive"
-                    >
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
@@ -160,9 +138,6 @@ const Navbar = () => {
               {/* Conditionally render based on authentication */}
               {isAuthenticated ? (
                 <div className="flex flex-col space-y-2 px-4">
-                  <div className="px-4 py-2 text-sm font-semibold text-primary">
-                    Hi, {user?.name}
-                  </div>
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
@@ -174,7 +149,7 @@ const Navbar = () => {
                   <Button
                     variant="ghost"
                     onClick={() => {
-                      logout();
+                      handleLogout();
                       setMobileMenuOpen(false);
                     }}
                     className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"

@@ -1,4 +1,5 @@
-import { NavSection } from "@/types/dashboardtypes";
+
+import { NavSection } from "@/types/dashboard.types";
 import { getDefaultDashboardRoute, UserRole } from "./authUtils";
 
 
