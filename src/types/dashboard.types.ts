@@ -13,6 +13,8 @@ export interface DashboardData {
   totalUsers: number;
   totalBookings: number;
   activeTripCount: number;
+  totalEarnings: number;
+  myBoatsCount: number;
   totalRevenue: number;
   totalSpent: number;
   piChartData: ChartDataPoint[];

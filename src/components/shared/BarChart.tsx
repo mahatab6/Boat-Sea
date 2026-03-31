@@ -57,11 +57,7 @@ const BoatBarChart = ({
               data={formattedData} 
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
             >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                vertical={false} 
-                stroke="hsl(var(--muted))" 
-              />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
               <XAxis 
                 dataKey="displayMonth" 
                 axisLine={false} 
@@ -75,7 +71,7 @@ const BoatBarChart = ({
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
               />
               <Tooltip 
-                cursor={{ fill: 'hsl(var(--muted)/0.4)' }}
+                cursor={{ fill: 'transparent' }} 
                 contentStyle={{ 
                   borderRadius: '8px', 
                   border: 'none', 
@@ -86,9 +82,14 @@ const BoatBarChart = ({
               />
               <Bar
                 dataKey="bookings"
-                fill="oklch(0.646 0.222 41.116)" 
+                fill="oklch(0.646 0.222 41.116)"
                 radius={[6, 6, 0, 0]}
                 maxBarSize={50}
+                activeBar={{ 
+                  fill: 'oklch(0.55 0.222 41.116)', 
+                  stroke: 'oklch(0.55 0.222 41.116)',
+                  cursor: 'pointer'
+                }}
               />
             </BarChart>
           </ResponsiveContainer>
