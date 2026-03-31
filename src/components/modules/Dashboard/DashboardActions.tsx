@@ -1,7 +1,7 @@
 "use client"
 
 import { UserInfo } from "@/types/user.types"
-import NotificationDropdown from "./NotificationDropdown"
+
 import UserDropdown from "./UserDropdown"
 
 interface Props {
@@ -10,11 +10,9 @@ interface Props {
 
 const DashboardActions = ({ userInfo }: Props) => {
   return (
-    <div className="flex items-center gap-2">
-
+    <div className=" md:flex items-center gap-2 hidden">
       {/* Notifications */}
-      <NotificationDropdown />
-
+   
       {/* User menu */}
       <UserDropdown userInfo={userInfo} />
 

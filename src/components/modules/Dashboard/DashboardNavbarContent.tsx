@@ -19,7 +19,7 @@ const DashboardNavbarContent = ({
 }: DashboardNavbarContentProps) => {
 
   return (
-    <div className="flex items-center gap-3 w-full border-b py-3.5 px-3">
+    <div className="flex items-center justify-end gap-3 w-full border-b py-3.5 px-3">
 
       {/* Mobile Menu */}
       <DashboardMobileMenu

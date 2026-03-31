@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button"
 import { User } from "lucide-react"
 import { UserInfo } from "@/types/user.types"
 import { toast } from "sonner"
-import logoutAction from "../Auth/logoutAction"
+
 import { redirect } from "next/navigation"
+import logoutAction from "../auth/logoutAction"
 
 
 

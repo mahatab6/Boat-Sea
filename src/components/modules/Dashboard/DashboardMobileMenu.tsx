@@ -5,8 +5,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { useState } from "react"
 import { NavSection } from "@/types/dashboardtypes"
-import { UserInfo } from "@/types/user.types"
 import DashboardMobileSidebar from "./DashboardMobileSidebar"
+import { UserInfo } from "@/types/user.types"
 
 interface Props {
   userInfo: UserInfo
@@ -19,11 +19,13 @@ const DashboardMobileMenu = ({ userInfo, navItems, dashboardHome }: Props) => {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5"/>
-        </Button>
-      </SheetTrigger>
+      <SheetTrigger 
+        render={
+          <Button variant="outline" size="icon" className="md:hidden">
+            <Menu className="h-5 w-5"/>
+          </Button>
+        }
+      />
 
       <SheetContent side="left" className="w-72 p-0 h-full"> 
         <DashboardMobileSidebar
