@@ -24,6 +24,8 @@ import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import BookingFlow from '@/components/shared/bookingFlow';
 import { toast } from 'sonner';
+import { getUserInfo } from '@/services/auth.services';
+import { useUser } from '@/hooks/useUser';
 
 // Mock Data for the Specific Boat
 const MOCK_BOAT = {
@@ -62,8 +64,8 @@ const BoatDetailPage = () => {
   const { id } = useParams();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-
-  const isAuthenticated = true;
+  const { user }: any = useUser();
+  const isAuthenticated = !!user?.email
 
   // Mock booked dates (e.g., tomorrow and the day after)
   const bookedDates = [

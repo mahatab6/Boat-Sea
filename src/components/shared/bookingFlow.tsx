@@ -6,7 +6,6 @@ import { format, differenceInDays } from "date-fns";
 import {
   CalendarIcon,
   Check,
-  CreditCard,
   Users,
   Ship,
   ArrowRight,
@@ -33,13 +32,6 @@ interface BookingFlowProps {
   boat: any;
 }
 
-interface AnimatedModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  children: React.ReactNode;
-  className?: string; // Make it optional if you want
-}
 
 const STEPS = [
   { id: 1, label: "Schedule" },
@@ -335,7 +327,7 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="rounded-xl flex-[2] h-12"
+            className="rounded-xl flex-2 h-12"
           >
             {loading ? "Processing..." : "Confirm & Pay"}
           </Button>

@@ -3,7 +3,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { useGSAPAnimation } from '@/hooks/useGSAPAnimation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AnimatedModal = ({ open, onOpenChange, title, children, className }) => {
+interface AnimatedModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  children: React.ReactNode;
+  className?: string; 
+}
+
+
+const AnimatedModal = ({ open, onOpenChange, title, children, className } : AnimatedModalProps) => {
     const { prefersReducedMotion } = useGSAPAnimation();
   return (
       <Dialog open={open} onOpenChange={onOpenChange}>
