@@ -1,4 +1,5 @@
-export type UserRole = "SUPER_ADMIN" | "ADMIN" | "DOCTOR" | "PATIENT";
+export type UserRole = "SUPER_ADMIN" | "ADMIN" | "BOAT_OWNER" | "CUSTOMER";
+
 
 export const authRoutes = [
   "/login",
