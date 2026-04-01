@@ -15,9 +15,18 @@ export const registerZodSchema = z.object({
     role : z.string().optional()
 })
 
+export const verifyemailZodSchema = z.object({
+    email : z.string("Enter your email"),
+    otp: z.string("Enter 6-digit code")
+})
+
+
+
 
 export type IRegisterPayload = z.infer<typeof registerZodSchema>
 
 export type ILoginPayload = z.infer<typeof loginZodSchema>
+
+export type IverifyemailPayload = z.infer<typeof verifyemailZodSchema>
 
 

@@ -2,35 +2,41 @@
 "use server";
 
 import { httpClient } from "@/lib/axios/httpClient";
-import { setTokenInCookies } from "@/lib/tokenUtils";
 import { ApiErrorResponse } from "@/types/api.types";
-import { IRegisterResponse } from "@/types/auth.types";
+import { IRegisterResponse, IRegisterResponseData } from "@/types/auth.types";
 import { IRegisterPayload, registerZodSchema } from "@/zod/auth.validation";
 import { redirect } from "next/navigation";
 
 export const RegisterAction = async (
-  payload: IRegisterPayload,
+  payload: IRegisterPayload
 ): Promise<IRegisterResponse | ApiErrorResponse> => {
+
   const parsedPayload = registerZodSchema.safeParse(payload);
+
   if (!parsedPayload.success) {
-    const firstError = parsedPayload.error.issues[0].message || "Invalid input";
     return {
       success: false,
-      message: firstError,
+      message: parsedPayload.error.issues[0].message,
     };
   }
-  try {
-    const response = await httpClient.post<IRegisterResponse>(
-      "/auth/register",
-      parsedPayload.data,
-    );
-    const { accessToken, refreshToken, token } = response.data;
-    await setTokenInCookies("accessToken", accessToken);
-    await setTokenInCookies("refreshToken", refreshToken);
-    await setTokenInCookies("better-auth.session_token", token, 24 * 60 * 60);
 
-    redirect("/");
+  try {
+
+    const response = await httpClient.post<IRegisterResponseData>(
+      "/auth/register",
+      parsedPayload.data
+    );
+
+    const { user } = response.data;
+
+    if (!user.emailVerified) {
+      redirect(`/verify-email?email=${user.email}`);
+    }
+
+    return response.data;
+
   } catch (error: any) {
+
     if (
       error &&
       typeof error === "object" &&
@@ -40,9 +46,10 @@ export const RegisterAction = async (
     ) {
       throw error;
     }
+
     return {
       success: false,
-      message: `Login failed: ${error.message}`,
+      message: `Register failed: ${error.message}`,
     };
   }
 };

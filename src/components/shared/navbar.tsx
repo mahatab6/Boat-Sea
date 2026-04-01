@@ -14,11 +14,10 @@ interface useActiveProps {
   userActive: boolean
 }
 
-const Navbar = (userActive : useActiveProps) => {
+const Navbar = ({userActive} : useActiveProps) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
- 
   const isAuthenticated = userActive;
 
   const handleLogout = async () => {
@@ -77,19 +76,19 @@ const Navbar = (userActive : useActiveProps) => {
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <Button variant="outline" className="rounded-full" asChild >
+                <Button variant="outline" className="rounded-full hover:cursor-pointer" asChild >
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link href="/login">
-                  <Button variant="ghost" className="rounded-full">
+                  <Button variant="ghost" className="rounded-full hover:cursor-pointer">
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="rounded-full">Register</Button>
+                  <Button className="rounded-full hover:cursor-pointer">Register</Button>
                 </Link>
               </div>
             )}
@@ -103,7 +102,7 @@ const Navbar = (userActive : useActiveProps) => {
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-lg"
+              className="rounded-lg hover:cursor-pointer"
             >
               {mobileMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -142,7 +141,7 @@ const Navbar = (userActive : useActiveProps) => {
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start hover:cursor-pointer">
                       Dashboard
                     </Button>
                   </Link>
@@ -152,7 +151,7 @@ const Navbar = (userActive : useActiveProps) => {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 hover:cursor-pointer"
                   >
                     Logout
                   </Button>
@@ -160,7 +159,7 @@ const Navbar = (userActive : useActiveProps) => {
               ) : (
                 <div className="flex flex-col space-y-2 px-4">
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start hover:cursor-pointer">
                       Login
                     </Button>
                   </Link>
@@ -168,7 +167,7 @@ const Navbar = (userActive : useActiveProps) => {
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Button className="w-full justify-start">Register</Button>
+                    <Button className="w-full justify-start hover:cursor-pointer">Register</Button>
                   </Link>
                 </div>
               )}

@@ -1,13 +1,12 @@
+"use client"
 
-
-import React from "react";
+import React, { useState } from "react"; // Added useState
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { AnyFieldApi } from "@tanstack/react-form";
-/**
- * Safely extracts error strings from TanStack Form's error state
- */
+import { Eye, EyeOff } from "lucide-react"; 
+
 const getErrorMessage = (error: unknown): string => {
   if (typeof error === "string") return error;
   if (error && typeof error === "object" && "message" in error) {
@@ -37,13 +36,18 @@ const FormField = ({
   className,
   disabled = false,
 }: FormFieldProps) => {
-  // Extract error info from TanStack field state
+ 
+  const [showPassword, setShowPassword] = useState(false);
+
   const firstError =
     field.state.meta.isTouched && field.state.meta.errors.length > 0
       ? getErrorMessage(field.state.meta.errors[0])
       : null;
 
   const hasError = !!firstError;
+
+  
+  const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
     <div className={cn("flex flex-col space-y-2 w-full", className)}>
@@ -58,7 +62,6 @@ const FormField = ({
       </Label>
 
       <div className="relative group">
-        {/* Prepend Slot (e.g. Lucide Icons) */}
         {prepend && (
           <div className="absolute left-3 top-0 h-full flex items-center justify-center text-muted-foreground pointer-events-none transition-colors group-focus-within:text-primary">
             {prepend}
@@ -68,42 +71,47 @@ const FormField = ({
         <Input
           id={field.name}
           name={field.name}
-          type={type}
+          type={inputType} 
           value={field.state.value ?? ""}
           placeholder={placeholder}
           onBlur={field.handleBlur}
           onChange={(e) => {
-            // Handle number conversion automatically if type is number
             const val = type === "number" ? e.target.valueAsNumber : e.target.value;
             field.handleChange(val);
           }}
           disabled={disabled}
-          aria-invalid={hasError}
-          aria-describedby={hasError ? `${field.name}-error` : undefined}
           className={cn(
             "h-10 transition-all",
             prepend && "pl-10",
-            append && "pr-10",
-            hasError && "border-destructive ring-offset-background focus-visible:ring-destructive",
+            (append || type === "password") && "pr-10", 
+            hasError && "border-destructive focus-visible:ring-destructive",
             !hasError && "focus-visible:ring-primary"
           )}
         />
 
-        {/* Append Slot (e.g. Eye icon for passwords) */}
-        {append && (
-          <div className="absolute right-3 top-0 h-full flex items-center justify-center text-muted-foreground transition-colors group-focus-within:text-primary">
-            {append}
-          </div>
-        )}
+       
+        <div className="absolute right-3 top-0 h-full flex items-center justify-center text-muted-foreground transition-colors group-focus-within:text-primary">
+          {type === "password" ? (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="hover:text-foreground focus:outline-none transition-colors"
+              tabIndex={-1} 
+            >
+              {showPassword ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          ) : (
+            append
+          )}
+        </div>
       </div>
 
-      {/* Error Message Section */}
       {hasError && (
-        <p
-          id={`${field.name}-error`}
-          role="alert"
-          className="text-[0.8rem] font-medium text-destructive animate-in fade-in slide-in-from-top-1"
-        >
+        <p className="text-[0.8rem] font-medium text-destructive animate-in fade-in slide-in-from-top-1">
           {firstError}
         </p>
       )}

@@ -1,23 +1,16 @@
-import CustomerDashboardContent from "@/components/modules/Dashboard/Customer/CustomerDashboardContent";
-import { getDashboardData } from "@/services/dashboard.services";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
+import { getUserInfo } from "@/services/auth.services";
+import { getDefaultDashboardRoute } from "@/lib/authUtils";
 
-const CustomerPage = async () => {
 
-  const queryClient = new QueryClient();
+export default async function DashboardPage() {
+  const user = await getUserInfo();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["cutomer-dashboard-data"],
-    queryFn: getDashboardData,
-    staleTime: 30 * 1000,
-    gcTime: 5 * 60 * 1000
-  })
+  if (!user) {
+    redirect("/login");
+  }
 
-  return (
-      <HydrationBoundary state={dehydrate(queryClient)}>
-      <CustomerDashboardContent/>
-    </HydrationBoundary>
-  )
+  const route = getDefaultDashboardRoute(user.role);
+
+  redirect(route);
 }
-
-export default CustomerPage
