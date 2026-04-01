@@ -137,16 +137,6 @@ const MyBoatPage = () => {
             </SelectContent>
           </Select>
 
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Sort By" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="createdAt">Newest</SelectItem>
-              <SelectItem value="pricePerTrip">Price</SelectItem>
-              <SelectItem value="capacity">Capacity</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <Button onClick={() => openFormModal()} className="w-full md:w-auto bg-blue-600 hover:bg-blue-700">
