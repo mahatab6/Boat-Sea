@@ -1,3 +1,5 @@
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+
 export interface IBoat {
   id: string;
   boatName: string;
@@ -5,7 +7,7 @@ export interface IBoat {
   status: 'AVAILABLE' | 'BOOKED' | 'MAINTENANCE';
   capacity: number;
   ownerId: string;
-  primary_img: string;
+  primary_img: string | StaticImport;
   boatCondition: string;
   location: string;
   pricePerTrip: number;
