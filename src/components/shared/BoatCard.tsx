@@ -17,13 +17,13 @@ const BoatCard = ({ boat }: BoatCardProps) => {
   const displayPrice = boat.pricePerTrip || 0;
 
   return (
-    <Link href={`/boats/${boat.id}`} className="group block h-full">
+    <Link href={`/browse-boats/${boat.id}`} className="group block h-full">
       <Card className="relative overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 h-full bg-card group-hover:-translate-y-2 rounded-[2rem]">
         
         {/* Image Section */}
         <div className="relative h-72 overflow-hidden">
           <Image
-            src={boat.boat_images || "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=800"}
+            src={boat.primary_img || ''}
             alt={boat.boatName}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -72,7 +72,7 @@ const BoatCard = ({ boat }: BoatCardProps) => {
 
           {/* Description - Clamped to 2 lines */}
           <p className="text-muted-foreground text-sm line-clamp-2 mb-6 min-h-[40px]">
-            {boat?.amenities}
+            {boat?.description}
           </p>
 
           {/* Footer Info */}

@@ -3,27 +3,30 @@ import { StaticImport } from "next/dist/shared/lib/get-img-props";
 export interface IBoat {
   id: string;
   boatName: string;
-  boatType: 'SPEEDBOAT' | 'YACHT' | 'FISHING_BOAT' | string;
-  status: 'AVAILABLE' | 'BOOKED' | 'MAINTENANCE';
+  boatType: "SPEEDBOAT" | "FERRY" | "LAUNCH" | "PRIVATE" | "YACHT" | "CATAMARAN";
+  status: "AVAILABLE" | "BOOKED" | "MAINTENANCE" | "UNAVAILABLE" | "SUSPENDED";
+  primary_img: string | StaticImport;
   capacity: number;
   ownerId: string;
-  primary_img: string | StaticImport;
   boatCondition: string;
   location: string;
   pricePerTrip: number;
+  description: string;
   length: number;
   width: number;
   engineCapacity: number;
   manufacturer: string;
   manufacturingYear: number;
+  specifications: string;
   amenities: string[];
   cancellationPolicy: string;
-  rating: number;
-  totalReviews: number;
-  isApproved: boolean;
-  createdAt: string;
-  updatedAt: string;
-  boat_images: string[]; 
+
+  rating: number;           
+  totalReviews: number;     
+  isApproved: boolean;      
+  createdAt: string | Date; 
+  updatedAt: string | Date;
+
 }
 
 export interface MyBoatsResponse {
