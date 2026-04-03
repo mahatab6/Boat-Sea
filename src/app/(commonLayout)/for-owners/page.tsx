@@ -73,10 +73,7 @@ const ForOwnersPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="rounded-full px-10 h-14 text-lg font-bold shadow-xl shadow-primary/20">
-                List Your Boat Now
-              </Button>
-              <Button size="lg" variant="outline" className="rounded-full px-10 h-14 text-lg font-bold text-black border-white/20 hover:bg-white/10">
-                View Earnings Estimator
+                <Link href={'/register'}>List Your Boat Now</Link>
               </Button>
             </div>
           </div>
@@ -170,13 +167,13 @@ const ForOwnersPage = () => {
                 Create your account today and list your first boat in under 15 minutes.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link href="/signup">
+                <Link href="/register">
                   <Button size="lg" variant="secondary" className="rounded-full px-10 h-16 text-lg font-bold group/btn">
                     Start Listing <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <Button size="lg" variant="ghost" className="rounded-full px-10 h-16 text-lg font-bold text-primary-foreground hover:bg-primary-foreground/10">
-                  Talk to an Expert
+                  <Link href={'/contact'}>Talk to an Expert</Link>
                 </Button>
               </div>
             </div>
