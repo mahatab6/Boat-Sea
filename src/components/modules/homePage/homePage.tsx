@@ -10,9 +10,9 @@ const HomePage = () => {
     <main>
       <Hero/>
       <FeaturedBoat/>
-      <PopularRoutes/>
+      {/* <PopularRoutes/>
       <HowItWorks/>
-      <Testimonials />
+      <Testimonials /> */}
     </main>
   );
 };

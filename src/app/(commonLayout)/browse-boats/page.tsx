@@ -23,8 +23,14 @@ import { useQuery } from "@tanstack/react-query";
 import BoatCard from "@/components/shared/BoatCard";
 import { getAllBoats } from "@/services/getAllBoat.services";
 import { IBoat } from "@/types/boat.types";
+import { useSearchParams } from "next/navigation";
 
 const BoatsListingPage = () => {
+  const searchParams = useSearchParams();
+
+  const urlSearchTerm = searchParams.get("searchTerm") || "";
+  const urlCapacity = searchParams.get("capacity") || "";
+  const urlDate =  "";
   /*
   ========================
   STATE
@@ -36,7 +42,7 @@ const BoatsListingPage = () => {
     Catamaran: <Ship className="w-4 h-4" />,
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
 
   const debouncedSearch = searchTerm;
 
@@ -48,6 +54,8 @@ const BoatsListingPage = () => {
     priceRange: [0, 2000],
     boatTypes: [] as string[],
     rating: 0,
+    capacity: urlCapacity || "",
+    date: urlDate || "",
   });
 
   /*
@@ -58,29 +66,26 @@ const BoatsListingPage = () => {
 
   const queryParams = useMemo(() => {
     return {
-      searchTerm: debouncedSearch,
-
+      searchTerm: searchTerm || undefined,
       page,
-
       limit: 10,
-
       sortBy,
-
       sortOrder: "desc",
-
       "pricePerTrip[gte]": filters.priceRange[0],
-
       "pricePerTrip[lte]": filters.priceRange[1],
-
       "rating[gte]": filters.rating,
-
       status: "AVAILABLE",
-
       ...(filters.boatTypes.length > 0 && {
         "type[in]": filters.boatTypes,
       }),
+      ...(filters.capacity && {
+        capacity: filters.capacity,
+      }),
+      ...(filters.date && {
+        date: filters.date,
+      }),
     };
-  }, [debouncedSearch, page, sortBy, filters]);
+  }, [searchTerm, page, sortBy, filters]);
 
   /*
   ========================
@@ -144,12 +149,12 @@ const BoatsListingPage = () => {
 
   const handleReset = () => {
     setFilters({
-      priceRange: [0, 2000],
-
-      boatTypes: [],
-
-      rating: 0,
-    });
+  priceRange: [0, 2000],
+  boatTypes: [],
+  rating: 0,
+  capacity: "",
+  date: "",
+});
 
     setSearchTerm("");
 
@@ -169,8 +174,7 @@ const BoatsListingPage = () => {
       <div className="bg-slate-950 py-20 mb-12 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="font-serif text-5xl font-bold mb-6">
-            Find Your{" "}
-            <span className="italic">Perfect Vessel</span>
+            Find Your <span className="italic">Perfect Vessel</span>
           </h1>
 
           <div className="relative max-w-xl">

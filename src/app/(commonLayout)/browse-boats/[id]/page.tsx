@@ -46,7 +46,6 @@ const BoatDetailPage = () => {
     queryFn: () => getBoatById(id as string),
     enabled: !!id,
   });
-  console.log(response);
   const boat = response as IBoat;
 
   const bookedDates = [
