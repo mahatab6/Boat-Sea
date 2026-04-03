@@ -55,7 +55,7 @@ const PopularRoutes = () => {
               Hand-picked maritime adventures curated by our local captains.
             </p>
           </div>
-          <Link href={'/'} className="text-primary font-semibold hover:underline flex items-center gap-2">
+          <Link href={'/routes'} className="text-primary font-semibold hover:underline flex items-center gap-2">
             View all routes <Navigation2 className="w-4 h-4" />
           </Link>
         </div>
@@ -106,12 +106,6 @@ const PopularRoutes = () => {
                   <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-6">
                     {route.description}
                   </p>
-
-                  <div className="mt-auto">
-                    <button className="text-sm font-bold uppercase tracking-widest text-foreground hover:text-primary transition-colors">
-                      Explore Route →
-                    </button>
-                  </div>
                 </CardContent>
               </div>
             </Card>

@@ -4,15 +4,17 @@ import HowItWorks from "./howItWorks";
 import PopularRoutes from "./popularRoutes";
 import FeaturedBoat from "./featuredBoat";
 import Hero from "./hero";
+import YateBoat from "./yateBoat";
 
 const HomePage = () => {
   return (
     <main>
       <Hero/>
       <FeaturedBoat/>
-      {/* <PopularRoutes/>
+      <YateBoat/>
+      <PopularRoutes/>
       <HowItWorks/>
-      <Testimonials /> */}
+      <Testimonials />
     </main>
   );
 };

@@ -4,60 +4,41 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Anchor, Navigation2, MapPin } from 'lucide-react';
+import { Clock, Anchor, Navigation2, MapPin, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getRoute } from '@/services/getRoute.services';
+import { useQuery } from '@tanstack/react-query';
+import { IRoute } from '@/types/route.types';
 
-// Mock Data for better UI testing
-const routes = [
-  {
-    id: '1',
-    name: 'The Emerald Coast Explorer',
-    difficulty: 'Easy',
-    duration: '4-6 Hours',
-    distance: '12km',
-    scenicHighlights: 'Hidden Sea Caves, Crystal Waters',
-    description: 'Cruise through crystal clear turquoise waters and discover hidden sea caves along the rugged coastline. Perfect for families and beginners.',
-    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: '2',
-    name: 'Sunset Archipelago Trail',
-    difficulty: 'Moderate',
-    duration: '3 Hours',
-    distance: '8km',
-    scenicHighlights: 'Volcanic Islands, Golden Hour Views',
-    description: 'Navigate through a cluster of volcanic islands as the sun dips below the horizon. Experience the most vibrant golden hour on the water.',
-    image: 'https://images.unsplash.com/photo-1500916434205-0c77489c6cf7?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: '3',
-    name: 'Deep Sea Fishing Route',
-    difficulty: 'Advanced',
-    duration: '8-10 Hours',
-    distance: '45km',
-    scenicHighlights: 'Deep Blue Horizon, Big Game Territory',
-    description: 'Venture into deep blue waters where the big game hangs out. This route takes you past the shelf into prime marlin and tuna territory.',
-    image: 'https://images.unsplash.com/photo-1534239143101-1b1c627395c5?auto=format&fit=crop&q=80&w=800',
-  },
-  {
-    id: '4',
-    name: 'Ancient Harbor Passage',
-    difficulty: 'Easy',
-    duration: '2 Hours',
-    distance: '5km',
-    scenicHighlights: '16th-century Fortresses, Old Lighthouse',
-    description: 'A historical journey passing by 16th-century fortresses and the old city lighthouse. Smooth waters and plenty of photo opportunities.',
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800',
-  },
-];
 
 const RoutesPage = () => {
- const [selectedDifficulty, setSelectedDifficulty] = useState('All');
-  const filteredRoutes = selectedDifficulty === 'All' 
-    ? routes 
-    : routes.filter((route) => route.difficulty === selectedDifficulty);
+  const [selectedDifficulty, setSelectedDifficulty] = useState('All');
 
-  const difficulties = ['All', 'Easy', 'Moderate', 'Advanced'];
+  // 1. Fetch real data from your backend
+  const { data: response, isLoading } = useQuery({
+    queryKey: ["routes"],
+    queryFn: () => getRoute(),
+  });
+
+  const routes: IRoute[] = response?.data ?? [];
+
+  // 2. Filter logic (handling uppercase Enum values from DB)
+  const filteredRoutes = selectedDifficulty === 'All'
+    ? routes
+    : routes.filter((route) => 
+        route.difficulty.toLowerCase() === selectedDifficulty.toLowerCase()
+      );
+
+  const difficulties = ['All', 'Easy', 'Moderate', 'Hard'];
+
+  // 3. Loading State
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background py-8 md:py-12">
@@ -109,7 +90,7 @@ const RoutesPage = () => {
                 {/* Image Section */}
                 <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden">
                   <Image
-                    src={route.image}
+                    src={route.image || '/placeholder-route.jpg'} // Fallback image
                     alt={route.name}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -119,8 +100,8 @@ const RoutesPage = () => {
                   <div className="absolute top-4 left-4">
                     <span className={cn(
                       "px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-black shadow-lg text-white",
-                      route.difficulty === 'Easy' ? 'bg-emerald-500' :
-                      route.difficulty === 'Moderate' ? 'bg-amber-500' :
+                      route.difficulty === 'EASY' ? 'bg-emerald-500' :
+                      route.difficulty === 'MODERATE' ? 'bg-amber-500' :
                       'bg-rose-600'
                     )}>
                       {route.difficulty}
