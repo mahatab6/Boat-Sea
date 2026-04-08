@@ -1,9 +1,8 @@
 
-import { isTokenExpiringSoon } from "../tokenUtils";
-import { getNewTokensWithRefreshToken } from "@/services/auth.services";
+
 import axios from "axios";
 import { ApiResponse } from "@/types/api.types";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 
 
 const API_BASE_URL = process.env.API_BASE_URL;
@@ -12,37 +11,12 @@ if (!API_BASE_URL) {
   throw new Error("Base url not defined");
 }
 
-async function tryRefreshToken(
-    accessToken : string,
-    refreshToken : string
-): Promise<void>{
-  if(!isTokenExpiringSoon(accessToken)){
-    return
-  }
-
-  const requestHeader = await headers();
-
-  if(requestHeader.get("x-token-refreshed") === "1"){
-    return;
-  }
-
-  try {
-    await getNewTokensWithRefreshToken(refreshToken)
-  } catch (error) {
-    console.error("Error refreshing token in http client", error)
-  }
-}
-
 const axiosInstance =async () => {
 
   const cookieStore = await cookies();
 
   const accessToken = cookieStore.get("accessToken")?.value;
   const refreshToken = cookieStore.get("refreshToken")?.value;
-
-  if(accessToken && refreshToken){
-    await tryRefreshToken(accessToken, refreshToken)
-  }
 
   const cookieHeader = cookieStore.getAll().map((cookie) => `${cookie.name}=${cookie.value}`).join("; ")
 
@@ -147,7 +121,7 @@ const httpPatch = async <TData>(
 
 const httpDelete = async <TData>(
   endpoint: string,
-  data: unknown,
+  data?: unknown,
   options?: ApiRequestOptions,
 ): Promise<ApiResponse<TData>> => {
   try {
@@ -157,6 +131,7 @@ const httpDelete = async <TData>(
       {
         params: options?.params,
         headers: options?.headers,
+        data,
       },
     );
     return response.data;
