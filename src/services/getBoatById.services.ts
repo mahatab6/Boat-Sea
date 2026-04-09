@@ -8,7 +8,7 @@ export async function getBoatById(id: string) {
     const response = await httpClient.get(`/boats/${id}`);
     return response.data;
   } catch (error: any) {
-    console.log(error, "From Boat Details Server action");
+
 
     return {
       success: false,

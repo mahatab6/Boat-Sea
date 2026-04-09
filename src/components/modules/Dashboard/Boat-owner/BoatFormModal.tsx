@@ -1,13 +1,10 @@
+
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from '@tanstack/react-form';
-
-import { 
-  X, Mail, Lock 
-} from 'lucide-react';
 import { toast } from 'sonner';
-
 
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle 
@@ -17,22 +14,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
 import { IBoat } from '@/types/boat.types';
+import { StaticRequire } from 'next/dist/shared/lib/get-img-props';
 
 interface BoatFormModalProps {
   open: boolean;
   onClose: () => void;
-  boat: IBoat;
-
+  boat?: IBoat; // Optional for "Add" mode
 }
 
-const BoatFormModal = ({ open, onClose, boat,  } : BoatFormModalProps) => {
-  
+const BoatFormModal = ({ open, onClose, boat }: BoatFormModalProps) => {
+  const [imageFile, setImageFile] = React.useState<File | null>(null);
+  const [imagePreview, setImagePreview] = React.useState<string | StaticRequire | null>(boat?.primary_img || null);
+
   // 1. TanStack Query Mutation
   const { mutateAsync, isPending: isMutationPending } = useMutation({
     mutationFn: async (formData: FormData) => {
-      console.log(formData)
+      
+      console.log("FormData sent to server:", formData);
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
     },
     onSuccess: () => {
       toast.success(boat ? 'Boat updated successfully' : 'Boat added successfully');
@@ -46,50 +50,38 @@ const BoatFormModal = ({ open, onClose, boat,  } : BoatFormModalProps) => {
   // 2. TanStack Form Setup
   const form = useForm({
     defaultValues: {
-      name: boat?.boatName || '',
-      boatType: boat?.boatType || 'Yacht',
+      boatName: boat?.boatName || '',
+      boatType: (boat?.boatType as any) || 'SPEEDBOAT',
+      status: boat?.status || 'AVAILABLE',
       capacity: boat?.capacity || 1,
-      maxGuests: boat?.capacity || 1,
-      pricePerDay: boat?.pricePerTrip || 0,
+      boatCondition: boat?.boatCondition || '',
       location: boat?.location || '',
-      coordinates: boat?.boatCondition || '',
-      description: boat?.boatCondition || '',
-      status: boat?.status || 'Active',
-      amenities: boat?.amenities || [],
-      insurance: boat?.id || false,
-      captainIncluded: boat?.engineCapacity || false,
-      specifications: boat?.length || { length: '', year: '', engine: '', fuel: '', speed: '' }
+      pricePerTrip: boat?.pricePerTrip || 0,
+      description: boat?.description || '',
+      length: boat?.length || 0,
+      width: boat?.width || 0,
+      engineCapacity: boat?.engineCapacity || 0,
+      manufacturer: boat?.manufacturer || '',
+      manufacturingYear: boat?.manufacturingYear || new Date().getFullYear(),
+      specifications: boat?.specifications || '',
+      amenities: boat?.amenities || [] as string[],
+      cancellationPolicy: boat?.cancellationPolicy || '',
     },
     onSubmit: async ({ value }) => {
-      const data = new FormData();
+      const formData = new FormData();
       
-      // Append standard fields
-      Object.entries(value).forEach(([key, val]) => {
-        if (key === 'specifications') {
-          data.append(key, JSON.stringify(val));
-        } else if (key === 'amenities') {
-          (val as string[]).forEach(a => data.append('amenities', a));
-        } else if (key !== 'image') {
-          data.append(key, val as any);
-        }
-      });
+      // Structure: data (JSON string), images (File)
+      const textData = { ...value };
+      
+      formData.append('data', JSON.stringify(textData));
 
-      data.append('boatId', boat.id);
-
-      // Handle Image (Assumes you maintain a local state for the file object)
       if (imageFile) {
-        data.append('image', imageFile);
-      } else if (!imagePreview && boat?.primary_img) {
-        data.append('image', ''); 
+        formData.append('images', imageFile);
       }
 
-      await mutateAsync(data);
+      await mutateAsync(formData);
     },
   });
-
-  // Local state for image handling (TanStack Form doesn't natively handle File objects in state well)
-  const [imageFile, setImageFile] = React.useState<File | null>(null);
-  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,11 +91,11 @@ const BoatFormModal = ({ open, onClose, boat,  } : BoatFormModalProps) => {
     }
   };
 
-  const amenitiesList = ['WiFi', 'Kitchen', 'Bedroom', 'Bathroom', 'Deck'];
+  const amenitiesList = ['GPS Navigation', 'Bluetooth Audio', 'Life Jackets', 'Cooler Box', 'First Aid Kit', 'WiFi', 'Kitchen'];
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif">
             {boat ? 'Edit Boat' : 'Add New Boat'}
@@ -118,73 +110,128 @@ const BoatFormModal = ({ open, onClose, boat,  } : BoatFormModalProps) => {
           }}
           className="space-y-6 mt-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            {/* Boat Name Field */}
-            <form.Field name="name">
+            {/* Boat Name */}
+            <form.Field name="boatName">
               {(field) => (
-                <div className="space-y-2 md:col-span-1">
-                  <Label htmlFor={field.name}>Boat Name</Label>
-                  <Input
-                    id={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
+                <div className="space-y-1">
+                  <Label>Boat Name</Label>
+                  <Input value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} placeholder="e.g. Oceanic Blue Express" />
                 </div>
               )}
             </form.Field>
 
-            {/* Boat Type Field */}
+            {/* Boat Type */}
             <form.Field name="boatType">
               {(field) => (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label>Type</Label>
-                  <Select value={field.state.value} >
+                  <Select value={field.state.value} onValueChange={field.handleChange}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Yacht">Yacht</SelectItem>
-                      <SelectItem value="Speedboat">Speedboat</SelectItem>
-                      <SelectItem value="Catamaran">Catamaran</SelectItem>
+                      <SelectItem value="SPEEDBOAT">Speedboat</SelectItem>
+                      <SelectItem value="YACHT">Yacht</SelectItem>
+                      <SelectItem value="CATAMARAN">Catamaran</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               )}
             </form.Field>
 
-            {/* Pricing: Price Per Day */}
-            <form.Field name="pricePerDay">
+            {/* Price & Capacity */}
+            <form.Field name="pricePerTrip">
               {(field) => (
-                <div className="space-y-2">
-                  <Label>Price/Day ($)</Label>
-                  <Input
-                    type="number"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
-                  />
+                <div className="space-y-1">
+                  <Label>Price Per Trip ($)</Label>
+                  <Input type="number" value={field.state.value} onChange={(e) => field.handleChange(Number(e.target.value))} />
                 </div>
               )}
             </form.Field>
 
-            {/* Amenities (Array Handling) */}
+            <form.Field name="capacity">
+              {(field) => (
+                <div className="space-y-1">
+                  <Label>Capacity (Guests)</Label>
+                  <Input type="number" value={field.state.value} onChange={(e) => field.handleChange(Number(e.target.value))} />
+                </div>
+              )}
+            </form.Field>
+
+            {/* Location & Condition */}
+            <form.Field name="location">
+              {(field) => (
+                <div className="space-y-1">
+                  <Label>Location</Label>
+                  <Input value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                </div>
+              )}
+            </form.Field>
+
+            <form.Field name="boatCondition">
+              {(field) => (
+                <div className="space-y-1">
+                  <Label>Condition</Label>
+                  <Input value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} placeholder="e.g. Excellent" />
+                </div>
+              )}
+            </form.Field>
+
+            {/* Technical Specs */}
+            <div className="grid grid-cols-3 gap-2 md:col-span-2">
+                <form.Field name="length">
+                    {(field) => (
+                        <div className="space-y-1">
+                            <Label>Length (ft)</Label>
+                            <Input type="number" value={field.state.value} onChange={(e) => field.handleChange(Number(e.target.value))} />
+                        </div>
+                    )}
+                </form.Field>
+                <form.Field name="engineCapacity">
+                    {(field) => (
+                        <div className="space-y-1">
+                            <Label>Engine (HP)</Label>
+                            <Input type="number" value={field.state.value} onChange={(e) => field.handleChange(Number(e.target.value))} />
+                        </div>
+                    )}
+                </form.Field>
+                <form.Field name="manufacturingYear">
+                    {(field) => (
+                        <div className="space-y-1">
+                            <Label>Year</Label>
+                            <Input type="number" value={field.state.value} onChange={(e) => field.handleChange(Number(e.target.value))} />
+                        </div>
+                    )}
+                </form.Field>
+            </div>
+
+            {/* Description */}
+            <form.Field name="description">
+              {(field) => (
+                <div className="space-y-1 md:col-span-2">
+                  <Label>Description</Label>
+                  <Textarea value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                </div>
+              )}
+            </form.Field>
+
+            {/* Amenities */}
             <form.Field name="amenities">
               {(field) => (
-                <div className="space-y-4 md:col-span-2">
+                <div className="space-y-3 md:col-span-2">
                   <Label>Amenities</Label>
-                  <div className="flex flex-wrap gap-4">
-                    {amenitiesList.map((amenity) => (
-                      <div key={amenity} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={amenity}
-                          checked={field.state.value.includes(amenity)}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {amenitiesList.map((item) => (
+                      <div key={item} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={item} 
+                          checked={field.state.value.includes(item)} 
                           onCheckedChange={(checked) => {
-                            const nextValue = checked
-                              ? [...field.state.value, amenity]
-                              : field.state.value.filter((a) => a !== amenity);
-                            field.handleChange(nextValue);
+                            const current = field.state.value;
+                            field.handleChange(checked ? [...current, item] : current.filter(i => i !== item));
                           }}
                         />
-                        <Label htmlFor={amenity}>{amenity}</Label>
+                        <label htmlFor={item} className="text-sm">{item}</label>
                       </div>
                     ))}
                   </div>
@@ -192,34 +239,29 @@ const BoatFormModal = ({ open, onClose, boat,  } : BoatFormModalProps) => {
               )}
             </form.Field>
 
-            {/* Image Upload Section */}
+            {/* Image Upload */}
             <div className="space-y-2 md:col-span-2">
-              <Label>Primary Image</Label>
-              <Input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="boat-image" />
-              <div 
-                className="w-full max-w-md h-48 rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer"
-                onClick={() => document.getElementById('boat-image')?.click()}
-              >
-                {imagePreview ? (
-                  <img src={imagePreview} className="w-full h-full object-cover rounded-lg" />
-                ) : (
-                  <span className="text-muted-foreground">Upload Boat Image</span>
-                )}
-              </div>
+              <Label>Boat Image</Label>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageChange} 
+                className="cursor-pointer"
+              />
+              {imagePreview && (
+                <div className="mt-2 h-40 w-full overflow-hidden rounded-md border">
+                    <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                </div>
+              )}
             </div>
-
           </div>
 
-          <div className="flex justify-end gap-2 pt-6 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            
-            <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
-                <Button 
-                  type="submit" 
-                  disabled={!canSubmit || isMutationPending}
-                >
-                  {isMutationPending ? 'Saving...' : 'Save Boat'}
+          <div className="flex justify-end gap-3 pt-6 border-t">
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <form.Subscribe selector={(s) => [s.canSubmit]}>
+              {([canSubmit]) => (
+                <Button type="submit" disabled={!canSubmit || isMutationPending}>
+                  {isMutationPending ? 'Uploading...' : boat ? 'Update Boat' : 'Create Boat'}
                 </Button>
               )}
             </form.Subscribe>

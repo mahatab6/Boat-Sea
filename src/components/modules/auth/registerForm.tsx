@@ -40,7 +40,7 @@ const RegisterForm = () => {
 
       setServerError(null);
       try {
-        console.log(value)
+    
         const result = (await mutateAsync(value)) as any;
         if (result.success) {
           setServerError(null);

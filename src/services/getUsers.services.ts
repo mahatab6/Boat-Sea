@@ -11,7 +11,6 @@ export const getAllUsers = async () => {
     const response = await httpClient.get<ApiResponse<UserDetails[]>>('/users/getalluser');
     return response.data
     } catch (error) {
-        console.log("Error fetching doctors:", error)
         throw error;
 
     }

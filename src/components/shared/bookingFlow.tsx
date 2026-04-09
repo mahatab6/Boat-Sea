@@ -86,7 +86,6 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    console.log(pricing)
     // Simulate API Call
     setTimeout(() => {
       setLoading(false);

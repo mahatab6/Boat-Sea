@@ -10,10 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getMyboat } from "@/services/getMyboat.services";
 import { IBoat } from "@/types/boat.types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { hover } from "framer-motion";
 import {
   Anchor,
   Badge,
-  CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Edit,
@@ -31,7 +31,7 @@ const MyBoatPage = () => {
   // --- 1. FILTER & PAGINATION STATE ---
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [limit] = useState(3);
+  const [limit] = useState(10);
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("createdAt");
 
@@ -63,9 +63,8 @@ const MyBoatPage = () => {
     const loadingId = toast.loading("Deleting...");
     try {
       await deleteBoatAction(boatId);
-      toast.success("Boat deleted!", { id: loadingId });
-      // CRITICAL: Refetch the data after deletion
       queryClient.invalidateQueries({ queryKey: ["get-my-boat"] });
+      toast.success("Boat deleted!", { id: loadingId });
     } catch (error) {
       toast.error("Failed to delete", { id: loadingId });
     }
@@ -80,6 +79,7 @@ const MyBoatPage = () => {
             <Button 
               size="sm" 
               variant="destructive" 
+              className={"hover:cursor-pointer"}
               onClick={() => { toast.dismiss(confirmToastId); executeDeletion(boatId); }}
             >
               OK
@@ -87,6 +87,7 @@ const MyBoatPage = () => {
             <Button 
               size="sm" 
               variant="outline" 
+              className={"hover:cursor-pointer"}
               onClick={() => toast.dismiss(confirmToastId)}
             >
               Cancel
@@ -146,7 +147,7 @@ const MyBoatPage = () => {
 
       {/* --- CONTENT --- */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="animate-pulse h-80 bg-muted" />
           ))}
@@ -159,7 +160,7 @@ const MyBoatPage = () => {
           <Button onClick={() => openFormModal()}>List a Boat</Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {resBoats.map((boat) => (
             <Card key={boat.id} className="overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
               <div className="h-48 bg-muted relative overflow-hidden">
@@ -168,20 +169,16 @@ const MyBoatPage = () => {
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-slate-100"><Anchor className="opacity-20" /></div>
                 )}
-                <div className="absolute top-3 right-3">
-                  <Badge className={boat.status === "AVAILABLE" ? "bg-green-500 text-white" : "bg-orange-500"}>
-                    {boat.status}
-                  </Badge>
-                </div>
+                
               </div>
               <CardContent className="p-5 flex-1 flex flex-col">
                 <h3 className="text-xl font-semibold mb-2">{boat.boatName}</h3>
                 <p className="text-primary font-bold mb-4">${boat.pricePerTrip} / Trip</p>
                 <div className="mt-auto flex gap-2 border-t pt-4">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => openFormModal(boat)}>
+                  <Button size="sm" variant="outline" className="flex-1 hover:cursor-pointer" onClick={() => openFormModal(boat)}>
                     <Edit className="w-4 h-4 mr-2" /> Edit
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(boat.id)}>
+                  <Button size="sm" variant="destructive" className="hover:cursor-pointer" onClick={() => handleDelete(boat.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>

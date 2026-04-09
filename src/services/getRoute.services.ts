@@ -12,7 +12,7 @@ export async function getRoute(): Promise<ApiResponse<IRoute[]>> {
     return response; 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.log(error, "From Featured Boats API");
+
 
     return {
       success: false,

@@ -37,7 +37,7 @@ const VerifyEmailForm = ({ email }: VerifyEmailFormProps) => {
       setServerError(null);
       try {
         const result = await mutateAsync(value);
-        console.log("verification", result);
+       
 
         if (result?.success) {
           toast.success(result.message || "Email verified successfully");

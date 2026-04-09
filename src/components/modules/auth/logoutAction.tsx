@@ -6,7 +6,7 @@ const logoutAction = async () => {
 try {
     await httpClient.post("/auth/logout", {})
   } catch (error) {
-    console.error("Backend logout failed", error);
+
   } finally {
     const cookieStore = await cookies();
     cookieStore.delete("accessToken");

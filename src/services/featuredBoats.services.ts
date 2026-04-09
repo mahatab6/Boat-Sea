@@ -13,7 +13,7 @@ export async function featuredBoats(): Promise<ApiResponse<IBoat[]>> {
 
     return response; 
   } catch (error: any) {
-    console.log(error, "From Featured Boats API");
+ 
 
     return {
       success: false,

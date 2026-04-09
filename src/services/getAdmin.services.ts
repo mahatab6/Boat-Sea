@@ -15,7 +15,7 @@ export const getAllAdmin = async (params: Record<string, any> = {}): Promise<Api
         
         return response; 
     } catch (error) {
-        console.error("Error fetching admins:", error);
+        
         throw error;
     }
 }

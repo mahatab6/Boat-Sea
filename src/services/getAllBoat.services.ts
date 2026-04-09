@@ -14,7 +14,7 @@ export async function getAllBoats(params: Record<string, any> = {}): Promise<Api
     const response = await httpClient.get<IBoat[]>(url);
     return response;
   } catch (error: any) {
-    console.log(error, "From Dashboard Server action");
+
 
     return {
       success: false,

@@ -17,7 +17,6 @@ export const useUser = () => {
                 setUser(data);
             } catch (error : any) {
                 setError(error);
-                console.error("User fetch error:", error);
             } finally {
                 setIsLoading(false);
             }
