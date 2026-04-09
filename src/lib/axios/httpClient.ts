@@ -1,9 +1,6 @@
-
-
-import axios from "axios";
 import { ApiResponse } from "@/types/api.types";
+import axios from "axios";
 import { cookies } from "next/headers";
-
 
 const API_BASE_URL = process.env.API_BASE_URL;
 
@@ -11,24 +8,28 @@ if (!API_BASE_URL) {
   throw new Error("Base url not defined");
 }
 
-const axiosInstance =async () => {
-
+const axiosInstance = async () => {
   const cookieStore = await cookies();
-
-  const accessToken = cookieStore.get("accessToken")?.value;
-  const refreshToken = cookieStore.get("refreshToken")?.value;
-
-  const cookieHeader = cookieStore.getAll().map((cookie) => `${cookie.name}=${cookie.value}`).join("; ")
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
 
   const instance = axios.create({
     baseURL: API_BASE_URL,
     timeout: 30000,
     headers: {
-      "Content-Type": "application/json",
-      Cookie : cookieHeader
+      Cookie: cookieHeader,
+    
     },
   });
+
   return instance;
+};
+
+// Helper to detect if we are sending FormData
+const isFormData = (data: unknown): data is FormData => {
+  return data instanceof FormData;
 };
 
 export interface ApiRequestOptions {
@@ -36,109 +37,67 @@ export interface ApiRequestOptions {
   headers: Record<string, string>;
 }
 
-const httpGet = async <TData>(
-  endpoint: string,
-  options?: ApiRequestOptions,
-): Promise<ApiResponse<TData>> => {
-  try {
-    const instance = await axiosInstance();
-    const response = await instance.get<ApiResponse<TData>>(endpoint, {
-      params: options?.params,
-      headers: options?.headers,
-    });
-    return response.data;
-  } catch (error) {
 
-    throw error;
-  }
+const httpGet = async <TData>(endpoint: string, options?: ApiRequestOptions): Promise<ApiResponse<TData>> => {
+  const instance = await axiosInstance();
+  const response = await instance.get(endpoint, options);
+  return response.data;
 };
 
 const httpPost = async <TData>(
   endpoint: string,
   data: unknown,
-  options?: ApiRequestOptions,
-): Promise<ApiResponse<TData>> => {
-  try {
-    const instance = await axiosInstance();
-    const response = await instance.post<ApiResponse<TData>>(
-      endpoint,
-      data,
-      {
-        params: options?.params,
-        headers: options?.headers,
-      },
-    );
-    return response.data;
-  } catch (error) {
-  
-    throw error;
-  }
+  options?: ApiRequestOptions
+) : Promise<ApiResponse<TData>> => {
+  const instance = await axiosInstance();
+
+  const response = await instance.post(endpoint, data, {
+    ...(isFormData(data) && { headers: { "Content-Type": "multipart/form-data" } }),
+    ...options,
+  });
+
+  return response.data;
 };
 
 const httpPut = async <TData>(
   endpoint: string,
   data: unknown,
-  options?: ApiRequestOptions,
-): Promise<ApiResponse<TData>> => {
-  try {
-    const instance = await axiosInstance();
-    const response = await instance.put<ApiResponse<TData>>(
-      endpoint,
-      data,
-      {
-        params: options?.params,
-        headers: options?.headers,
-      },
-    );
-    return response.data;
-  } catch (error) {
-    
-    throw error;
-  }
+  options?: ApiRequestOptions
+) : Promise<ApiResponse<TData>> => {
+  const instance = await axiosInstance();
+
+  const response = await instance.put(endpoint, data, {
+    // Important: If sending FormData → remove Content-Type or let Axios set it
+    ...(isFormData(data) 
+      ? { headers: { "Content-Type": "multipart/form-data" } } 
+      : { headers: { "Content-Type": "application/json" } }
+    ),
+    ...options,
+  });
+
+  return response.data;
 };
 
 const httpPatch = async <TData>(
   endpoint: string,
   data: unknown,
-  options?: ApiRequestOptions,
-): Promise<ApiResponse<TData>> => {
-  try {
-    const instance = await axiosInstance();
-    const response = await instance.patch<ApiResponse<TData>>(
-      endpoint,
-      data,
-      {
-        params: options?.params,
-        headers: options?.headers,
-      },
-    );
-    return response.data;
-  } catch (error) {
-
-    throw error;
-  }
+  options?: ApiRequestOptions
+) : Promise<ApiResponse<TData>> => {
+  const instance = await axiosInstance();
+  const response = await instance.patch(endpoint, data, {
+    ...(isFormData(data) 
+      ? { headers: { "Content-Type": "multipart/form-data" } } 
+      : { headers: { "Content-Type": "application/json" } }
+    ),
+    ...options,
+  });
+  return response.data;
 };
 
-const httpDelete = async <TData>(
-  endpoint: string,
-  data?: unknown,
-  options?: ApiRequestOptions,
-): Promise<ApiResponse<TData>> => {
-  try {
-    const instance = await axiosInstance();
-    const response = await instance.delete<ApiResponse<TData>>(
-      endpoint,
-      {
-        params: options?.params,
-        headers: options?.headers,
-        data,
-      },
-    );
-    return response.data;
-  } catch (error) {
-
-    throw error;
-  }
+const httpDelete = async <TData>(endpoint: string, options?: ApiRequestOptions) : Promise<ApiResponse<TData>> => {
+  const instance = await axiosInstance();
+  const response = await instance.delete(endpoint, options);
+  return response.data;
 };
 
 export const httpClient = {

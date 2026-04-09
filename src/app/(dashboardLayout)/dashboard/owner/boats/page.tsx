@@ -2,18 +2,15 @@
 
 import { deleteBoatAction } from "@/components/modules/Dashboard/Boat-owner/BoatDeleteAction";
 import BoatFormModal from "@/components/modules/Dashboard/Boat-owner/BoatFormModal";
-import BoatScheduleModal from "@/components/modules/Dashboard/Boat-owner/BoatScheduleModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getMyboat } from "@/services/getMyboat.services";
-import { IBoat } from "@/types/boat.types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { hover } from "framer-motion";
+
 import {
   Anchor,
-  Badge,
   ChevronLeft,
   ChevronRight,
   Edit,
@@ -22,6 +19,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -38,7 +36,7 @@ const MyBoatPage = () => {
   // Modal States
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const [selectedBoat, setSelectedBoat] = useState<IBoat | null>(null);
+  const [selectedBoat, setSelectedBoat] = useState(null);
 
  
   const { data: response, isLoading } = useQuery({
@@ -99,15 +97,10 @@ const MyBoatPage = () => {
     );
   };
 
-  const openFormModal = (boat: IBoat | null = null) => {
-    setSelectedBoat(boat);
+  const openFormModal = () => {
     setFormModalOpen(true);
   };
 
-  const openScheduleModal = (boat: IBoat) => {
-    setSelectedBoat(boat);
-    setScheduleModalOpen(true);
-  };
 
   return (
     <div className="space-y-6">
@@ -127,7 +120,7 @@ const MyBoatPage = () => {
             />
           </div>
 
-          <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setPage(1); }}>
+          <Select value={statusFilter} onValueChange={(val) => { if (val) { setStatusFilter(val); setPage(1); } }}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -140,7 +133,7 @@ const MyBoatPage = () => {
 
         </div>
 
-        <Button onClick={() => openFormModal()} className="w-full md:w-auto bg-blue-600 hover:bg-blue-700">
+        <Button onClick={() => openFormModal()} className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 hover:cursor-pointer">
           <Plus className="w-4 h-4 mr-2" /> Add New Boat
         </Button>
       </div>
@@ -175,9 +168,12 @@ const MyBoatPage = () => {
                 <h3 className="text-xl font-semibold mb-2">{boat.boatName}</h3>
                 <p className="text-primary font-bold mb-4">${boat.pricePerTrip} / Trip</p>
                 <div className="mt-auto flex gap-2 border-t pt-4">
-                  <Button size="sm" variant="outline" className="flex-1 hover:cursor-pointer" onClick={() => openFormModal(boat)}>
+                  <Link href={`boats/edit/${boat.id}`}>
+                  <Button size="sm" variant="outline" className="flex-1 hover:cursor-pointer">
+                     
                     <Edit className="w-4 h-4 mr-2" /> Edit
                   </Button>
+                 </Link>
                   <Button size="sm" variant="destructive" className="hover:cursor-pointer" onClick={() => handleDelete(boat.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -205,17 +201,8 @@ const MyBoatPage = () => {
       <BoatFormModal 
         open={formModalOpen} 
         onClose={() => setFormModalOpen(false)} 
-        boat={selectedBoat} 
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ["get-my-boat"] })}
       />
-
-      {selectedBoat && (
-        <BoatScheduleModal 
-          open={scheduleModalOpen} 
-          onClose={() => setScheduleModalOpen(false)} 
-          boat={selectedBoat} 
-        />
-      )}
     </div>
   );
 };
