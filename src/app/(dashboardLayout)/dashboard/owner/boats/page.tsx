@@ -35,8 +35,7 @@ const MyBoatPage = () => {
 
   // Modal States
   const [formModalOpen, setFormModalOpen] = useState(false);
-  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const [selectedBoat, setSelectedBoat] = useState(null);
+
 
  
   const { data: response, isLoading } = useQuery({
