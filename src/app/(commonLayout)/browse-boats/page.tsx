@@ -36,10 +36,12 @@ const BoatsListingPage = () => {
   STATE
   ========================
   */
-  const typeIcons = {
-    Yacht: <Anchor className="w-4 h-4" />,
-    Speedboat: <Zap className="w-4 h-4" />,
-    Catamaran: <Ship className="w-4 h-4" />,
+  const typeIcons: Record<string, React.ReactNode> = {
+    SPEEDBOAT: <Zap className="w-4 h-4" />,
+    FERRY: <Ship className="w-4 h-4" />,
+    LAUNCH: <Ship className="w-4 h-4" />,
+    PRIVATE: <Anchor className="w-4 h-4" />,
+    YACHT: <Anchor className="w-4 h-4" />,
   };
 
   const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
@@ -64,34 +66,37 @@ const BoatsListingPage = () => {
   ========================
   */
 
-  const queryParams = useMemo(() => {
-    return {
-      searchTerm: searchTerm || undefined,
-      page,
-      limit: 10,
-      sortBy,
-      sortOrder: "desc",
-      "pricePerTrip[gte]": filters.priceRange[0],
-      "pricePerTrip[lte]": filters.priceRange[1],
-      "rating[gte]": filters.rating,
-      status: "AVAILABLE",
-      ...(filters.boatTypes.length > 0 && {
-        "type[in]": filters.boatTypes,
-      }),
-      ...(filters.capacity && {
-        capacity: filters.capacity,
-      }),
-      ...(filters.date && {
-        date: filters.date,
-      }),
-    };
-  }, [searchTerm, page, sortBy, filters]);
+const queryParams = useMemo(() => {
+  return {
+    searchTerm: searchTerm || undefined,
+    page,
+    limit: 10,
 
-  /*
-  ========================
-  API CALL
-  ========================
-  */
+    sortBy: sortBy.replace("-", ""),
+    sortOrder: sortBy.startsWith("-") ? "asc" : "desc",
+
+    "pricePerTrip[gte]": filters.priceRange[0],
+    "pricePerTrip[lte]": filters.priceRange[1],
+
+    "rating[gte]": filters.rating,
+
+    status: "AVAILABLE",
+
+    ...(filters.boatTypes.length > 0 && {
+      boatType: filters.boatTypes.join(","),
+    }),
+
+    ...(filters.capacity && {
+      capacity: filters.capacity,
+    }),
+
+    ...(filters.date && {
+      date: filters.date,
+    }),
+  };
+}, [searchTerm, page, sortBy, filters]);
+
+ 
 
   const {
     data: response,
@@ -127,13 +132,15 @@ const BoatsListingPage = () => {
     }));
   };
 
-  const handlePriceChange = (val: number[]) => {
+  const handlePriceChange = (val: number | readonly number[]) => {
     setPage(1);
+
+    const priceArray = Array.isArray(val) ? val : [val];
 
     setFilters((prev) => ({
       ...prev,
 
-      priceRange: val,
+      priceRange: priceArray,
     }));
   };
 
@@ -161,11 +168,6 @@ const BoatsListingPage = () => {
     setPage(1);
   };
 
-  /*
-  ========================
-  UI
-  ========================
-  */
 
   return (
     <main className="min-h-screen bg-background pb-24">
@@ -290,7 +292,7 @@ const BoatsListingPage = () => {
               <div className="space-y-3">
                 <Label className="font-semibold text-base">Vessel Type</Label>
                 <div className="space-y-2">
-                  {["Yacht", "Speedboat", "Catamaran"].map((type) => {
+                  {["SPEEDBOAT", "FERRY", "LAUNCH", "PRIVATE", "YACHT" ].map((type) => {
                     const isSelected = filters.boatTypes.includes(type);
                     return (
                       <div

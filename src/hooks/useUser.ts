@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { getUserInfo } from "@/services/auth.services";
+import { UserInfo } from "@/types/user.types";
 import { useState, useEffect } from "react";
 
 
 export const useUser = () => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<UserInfo | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 

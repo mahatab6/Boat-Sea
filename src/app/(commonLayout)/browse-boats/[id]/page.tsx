@@ -13,7 +13,6 @@ import {
   Clock,
 } from "lucide-react";
 
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -21,10 +20,12 @@ import Image from "next/image";
 import BookingFlow from "@/components/shared/bookingFlow";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
-import { getBoatById } from "@/services/getBoatById.services";
+import { getBoatById, getRouteById } from "@/services/getBoatById.services";
 
 import { useQuery } from "@tanstack/react-query";
 import { IBoat } from "@/types/boat.types";
+import { ISchedule } from "@/types/schedule.type";
+
 
 const amenityIcons: Record<string, any> = {
   WiFi: Waves,
@@ -34,7 +35,7 @@ const BoatDetailPage = () => {
   const { id } = useParams();
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
-  const { user }: any = useUser();
+  const { user } = useUser();
   const isAuthenticated = !!user?.email;
 
   const { data: response, isLoading } = useQuery({
@@ -42,9 +43,23 @@ const BoatDetailPage = () => {
     queryFn: () => getBoatById(id as string),
     enabled: !!id,
   });
+
+  const { data: scheduleResponse, isLoading: scheduleLoading } = useQuery({
+    queryKey: ["schedule", id],
+    queryFn: () => getRouteById(id as string),
+    enabled: !!id,
+  });
+
+  if (isLoading || scheduleLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading boat details...
+      </div>
+    );
+
   const boat = response as IBoat;
 
-  
+  const schedules = scheduleResponse as ISchedule[];
 
   const handleBookNow = () => {
     if (!isAuthenticated) {
@@ -55,13 +70,6 @@ const BoatDetailPage = () => {
 
     setBookingModalOpen(true);
   };
-
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Loading boat details...
-      </div>
-    );
 
   if (!boat)
     return (
@@ -167,13 +175,28 @@ const BoatDetailPage = () => {
                 ${boat.pricePerTrip}
               </div>
 
-              <div className="space-y-3 mt-4 text-sm text-gray-500">
-                <div className="flex gap-2">
-                  <ShieldCheck /> Instant Confirmation
+              <div className="space-y-3 mt-4 text-sm text-gray-600">
+                {schedules?.map((schedule) => (
+                  <div
+                    key={schedule.id}
+                    className="p-3 rounded-lg border bg-gray-50"
+                  >
+                    <div className="font-semibold text-gray-800">
+                      🚢 {schedule.routeName}
+                    </div>
+
+                    <div className="text-xs text-gray-500">
+                      {schedule.departureTime} → {schedule.arrivalTime}
+                    </div>
+                  </div>
+                ))}
+
+                <div className="flex gap-2 items-center">
+                  <ShieldCheck size={16} /> Instant Confirmation
                 </div>
 
-                <div className="flex gap-2">
-                  <Clock /> Free Cancellation
+                <div className="flex gap-2 items-center">
+                  <Clock size={16} /> Free Cancellation
                 </div>
               </div>
 
@@ -189,6 +212,8 @@ const BoatDetailPage = () => {
         open={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}
         boat={boat}
+        user={user}
+        schedules={schedules}
       />
     </>
   );

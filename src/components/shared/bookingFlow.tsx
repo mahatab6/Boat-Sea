@@ -25,31 +25,46 @@ import {
 } from "@/components/ui/popover";
 import AnimatedModal from "./animatedModal";
 import { cn } from "@/lib/utils";
+import { UserInfo } from "@/types/user.types";
+import { ISchedule } from "@/types/schedule.type";
+import { IBoat } from "@/types/boat.types";
+import { bookingAndPayment } from "@/services/getBoatById.services";
 
 interface BookingFlowProps {
   open: boolean;
   onClose: () => void;
-  boat: any;
+  boat: IBoat;
+  user: UserInfo | null;
+  schedules: ISchedule[];
 }
 
-
 const STEPS = [
-  { id: 1, label: "Schedule" },
-  { id: 2, label: "Passengers" },
-  { id: 3, label: "Review" },
+  { id: 1, label: "Route" },
+  { id: 2, label: "Schedule" },
+  { id: 3, label: "Passengers" },
+  { id: 4, label: "Review" },
 ];
 
-const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
+const BookingFlow = ({
+  open,
+  onClose,
+  boat,
+  user,
+  schedules,
+}: BookingFlowProps) => {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
+    null,
+  );
 
   // Form States
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [passengerInfo, setPassengerInfo] = useState({
-    name: "", // Defaulting from your profile context
-    email: "",
+    name: user?.name,
+    email: user?.email,
     phone: "",
     numberOfGuests: 1,
   });
@@ -60,7 +75,7 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
       startDate && endDate
         ? Math.max(1, differenceInDays(endDate, startDate))
         : 0;
-    const basePrice = (boat?.pricePerDay || 0) * days;
+    const basePrice = (boat?.pricePerTrip || 0) * days;
     const tax = basePrice * 0.1;
     const serviceFee = basePrice > 0 ? 50 : 0;
     return {
@@ -70,36 +85,75 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
       serviceFee,
       total: basePrice + tax + serviceFee,
     };
-  }, [startDate, endDate, boat?.pricePerDay]);
+  }, [startDate, endDate, boat?.pricePerTrip]);
 
   const handleNext = () => {
-    if (step === 1 && (!startDate || !endDate))
+    if (step === 1 && !selectedSchedule)
+      return toast.error("Select a route first");
+
+    if (step === 2 && (!startDate || !endDate))
       return toast.error("Select booking dates");
-    if (step === 2) {
+
+    if (step === 3) {
       if (!passengerInfo.phone) return toast.error("Phone number is required");
+
       if (passengerInfo.numberOfGuests > (boat?.capacity || 1))
         return toast.error("Exceeds boat capacity");
     }
+
     setStep((s) => s + 1);
   };
 
   const handleSubmit = async () => {
+    if (!selectedSchedule || !startDate) {
+      return toast.error("Missing booking information");
+    }
+
     setLoading(true);
-    // Simulate API Call
-    setTimeout(() => {
+
+    const bookingPayload = {
+      scheduleId: selectedSchedule.id,
+      boatId: boat.id,
+      tripDate: startDate.toISOString(),
+      totalGuests: passengerInfo.numberOfGuests,
+      totalAmount: pricing.total,
+      paymentMethod: "STRIPE",
+      passengerDetails: [
+        {
+          fullName: passengerInfo.name,
+          isPrimary: true,
+        },
+      ],
+      emergencyContact: passengerInfo.phone,
+      specialRequests: "",
+    };
+
+    try {
+      const response: any = await bookingAndPayment(bookingPayload);
+      toast.success("Redirecting to payment...");
+      window.location.assign(response.paymentUrl);
+
+      console.log("Payment URL:", response?.paymentUrl);
+
+      // if (response?.success && response?.paymentUrl) {
+      //   setLoading(false);
+      //   return;
+      // }
+
       setLoading(false);
-      toast.success("Voyage Booked Successfully!");
-      onClose();
-      router.push("/dashboard");
-    }, 2000);
+      toast.error(response.message || "Failed to initiate payment");
+    } catch (error) {
+      setLoading(false);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
     <AnimatedModal
       open={open}
       onOpenChange={onClose}
-      title={`Booking: ${boat?.name}`}
-      className="max-w-2xl" // Fixed the missing className error
+      title={`Booking: ${boat?.boatName}`}
+      className="max-w-2xl"
     >
       {/* Step Indicator */}
       <nav className="flex justify-between mb-10 relative">
@@ -136,21 +190,42 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
       </nav>
 
       <div className="min-h-350px">
-        {/* STEP 1: DATES */}
         {step === 1 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
+            <Label>Select Route</Label>
+
+            <div className="grid gap-3">
+              {schedules?.map((schedule) => (
+                <button
+                  key={schedule.id}
+                  onClick={() => setSelectedSchedule(schedule)}
+                  className={cn(
+                    "border rounded-xl p-4 text-left transition",
+                    selectedSchedule?.id === schedule.id
+                      ? "border-primary bg-primary/5"
+                      : "hover:border-primary",
+                  )}
+                >
+                  <div className="font-semibold">🚢 {schedule.routeName}</div>
+
+                  <div className="text-xs text-muted-foreground">
+                    {schedule.departureTime} → {schedule.arrivalTime}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
           <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Check-in</Label>
                 <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start rounded-xl h-12"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                      {startDate ? format(startDate, "PPP") : "Pick Date"}
-                    </Button>
+                  <PopoverTrigger className="inline-flex items-center justify-start gap-2 w-full px-3 py-2 text-sm border border-input rounded-xl h-12 bg-background hover:bg-accent hover:text-accent-foreground">
+                    <CalendarIcon className="h-4 w-4 text-primary" />
+                    {startDate ? format(startDate, "PPP") : "Pick Date"}
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 rounded-2xl">
                     <Calendar
@@ -164,14 +239,9 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
               <div className="space-y-2">
                 <Label>Check-out</Label>
                 <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start rounded-xl h-12"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                      {endDate ? format(endDate, "PPP") : "Pick Date"}
-                    </Button>
+                  <PopoverTrigger className="inline-flex items-center justify-start gap-2 w-full px-3 py-2 text-sm border border-input rounded-xl h-12 bg-background hover:bg-accent hover:text-accent-foreground">
+                    <CalendarIcon className="h-4 w-4 text-primary" />
+                    {endDate ? format(endDate, "PPP") : "Pick Date"}
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 rounded-2xl">
                     <Calendar
@@ -186,8 +256,7 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
           </div>
         )}
 
-        {/* STEP 2: PASSENGERS */}
-        {step === 2 && (
+        {step === 3 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
             <div className="p-4 bg-primary/5 rounded-2xl flex items-center gap-4 mb-4">
               <Users className="text-primary" />
@@ -242,7 +311,7 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
         )}
 
         {/* STEP 3: REVIEW */}
-        {step === 3 && (
+        {step === 4 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
             <div className="border border-slate-100 rounded-3xl overflow-hidden bg-slate-50/50">
               <div className="p-6 border-b border-white bg-white/40">
@@ -252,7 +321,7 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
                 <div className="mt-4 grid grid-cols-2 gap-y-4 text-sm">
                   <div>
                     <p className="text-slate-400">Vessel</p>
-                    <p className="font-semibold">{boat?.name}</p>
+                    <p className="font-semibold">{boat?.boatName}</p>
                   </div>
                   <div>
                     <p className="text-slate-400">Duration</p>
@@ -262,15 +331,26 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
                     <p className="text-slate-400">Schedule</p>
                     <p className="font-semibold">
                       {format(startDate!, "MMM d")} —{" "}
-                      {format(endDate!, "MMM d")}, {timeSlot}
+                      {format(endDate!, "MMM d")},
                     </p>
                   </div>
+                </div>
+                <div>
+                  <p className="text-slate-400">Route</p>
+                  <p className="font-semibold">{selectedSchedule?.routeName}</p>
                 </div>
               </div>
               <div className="p-6 space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Base Rate</span>
-                  <span>${pricing.basePrice}</span>
+                  <span>
+                    Boat price {boat?.pricePerTrip} * Days {pricing.days} = $
+                    {pricing.basePrice}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tax</span>
+                  <span>${pricing.tax}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Service & Docking</span>
@@ -284,7 +364,6 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
             </div>
           </div>
         )}
-
       </div>
 
       {/* Footer Navigation */}
@@ -298,7 +377,7 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
             <ArrowLeft className="mr-2 w-4 h-4" /> Back
           </Button>
         )}
-        {step < 4 ? (
+        {step < STEPS.length ? (
           <Button
             onClick={handleNext}
             className="rounded-xl flex-[2] h-12 group"

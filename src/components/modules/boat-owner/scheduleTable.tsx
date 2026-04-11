@@ -25,7 +25,6 @@ const ScheduleTable = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -51,7 +50,7 @@ const ScheduleTable = () => {
   ];
 
   const { data: scheduleResponse, isLoading } = useQuery({
-    queryKey: ["getAllSchedule",  status, page, limit],
+    queryKey: ["getAllSchedule", status, page, limit],
     queryFn: () =>
       getAllSchedule({
         page,
@@ -62,7 +61,6 @@ const ScheduleTable = () => {
   console.log(scheduleResponse);
   const schedules = scheduleResponse?.data || [];
   const meta = scheduleResponse?.meta;
-
 
   const handleEdit = (schedule: ISchedule) => {
     setSelectedschedule(schedule);
@@ -77,8 +75,6 @@ const ScheduleTable = () => {
   return (
     <>
       <div className="flex items-center gap-4 pb-4">
-      
-
         {/* status Filter Select */}
         <Select
           value={status}
@@ -89,8 +85,8 @@ const ScheduleTable = () => {
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
-          </SelectTrigger> 
-   
+          </SelectTrigger>
+
           <SelectContent>
             <SelectItem value="ALL">All statuss</SelectItem>
             <SelectItem value="UPCOMING">UPCOMING</SelectItem>
@@ -118,19 +114,17 @@ const ScheduleTable = () => {
         }}
       />
 
-       
-      
-            <EditSchedule
-              open={editOpen}
-              onClose={() => setEditOpen(false)}
-              schedule={selectedschedule}
-            />
-      
-            <DeleteSchedule
-              open={deleteOpen}
-              onClose={() => setDeleteOpen(false)}
-              schedule={selectedschedule}
-            />
+      <EditSchedule
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        schedule={selectedschedule}
+      />
+
+      <DeleteSchedule
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        schedule={selectedschedule}
+      />
     </>
   );
 };

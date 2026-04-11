@@ -1,5 +1,3 @@
-
-
 export interface ISchedule {
   id: string;
 
@@ -21,7 +19,7 @@ export interface ISchedule {
 
   createdAt: string;
   updatedAt: string;
-
+  routeName?: string;
   boat?: {
     boatName: string;
   };
