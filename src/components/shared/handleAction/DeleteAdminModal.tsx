@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { UserDetails } from "@/types/user.types";
-import { deleteUserAccount } from "@/app/(dashboardLayout)/dashboard/admin/admins-management/_actions";
+import { deleteUserAccount } from "@/app/(dashboardLayout)/dashboard/admin/user-management/_actions";
 import { toast } from "sonner";
 
 interface Props {

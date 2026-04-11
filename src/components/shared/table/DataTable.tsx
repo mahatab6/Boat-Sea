@@ -45,6 +45,7 @@ const DataTable = <TData,>({
   const tableColumns = useMemo(() => {
     if (!actions) return columns;
 
+  
     const actionCol: ColumnDef<TData> = {
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
@@ -60,20 +61,20 @@ const DataTable = <TData,>({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[160px]">
                 {actions.onView && (
-                  <DropdownMenuItem onClick={() => actions.onView?.(rowData)}>
+                  <DropdownMenuItem className={"hover:cursor-pointer"} onClick={() => actions.onView?.(rowData)}>
                     View Details
                   </DropdownMenuItem>
                 )}
                 {actions.onEdit && (
-                  <DropdownMenuItem onClick={() => actions.onEdit?.(rowData)}>
-                    Edit Role
+                  <DropdownMenuItem className={"hover:cursor-pointer"} onClick={() => actions.onEdit?.(rowData)}>
+                    Edit
                   </DropdownMenuItem>
                 )}
                 {actions.onDelete && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
-                      className="text-destructive focus:text-destructive" 
+                      className="text-destructive focus:text-destructive hover:cursor-pointer" 
                       onClick={() => actions.onDelete?.(rowData)}
                     >
                       Delete
@@ -168,7 +169,7 @@ const DataTable = <TData,>({
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <select
-              className="h-8 w-[70px] rounded-md border bg-transparent"
+              className="h-8 w-[70px] rounded-md border bg-transparent hover:cursor-pointer"
               value={pagination?.pageSize}
               onChange={(e) => pagination?.onPageSizeChange(Number(e.target.value))}
             >
@@ -180,6 +181,7 @@ const DataTable = <TData,>({
           
           <div className="flex items-center space-x-2">
             <Button
+              className={"hover:cursor-pointer"}
               variant="outline"
               size="sm"
               onClick={() => pagination?.onPageChange?.((pagination?.pageIndex ?? 0) - 1)}
@@ -191,6 +193,7 @@ const DataTable = <TData,>({
               Page { (pagination?.pageIndex ?? 0) + 1} of {pagination?.pageCount}
             </div>
             <Button
+               className={"hover:cursor-pointer"}
               variant="outline"
               size="sm"
               onClick={() => pagination?.onPageChange?.((pagination?.pageIndex ?? 0) + 1)}

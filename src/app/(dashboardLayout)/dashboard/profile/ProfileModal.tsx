@@ -75,7 +75,7 @@ const ProfileModal = ({ userData }: { userData: IUser }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild={false}>
+      <DialogTrigger >
         <Button className="hover:cursor-pointer" variant="outline">
           <span>Edit Profile</span>
         </Button>
@@ -138,7 +138,7 @@ const ProfileModal = ({ userData }: { userData: IUser }) => {
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button className={"hover:cursor-pointer"} type="button" variant="ghost" onClick={() => setOpen(false)} >
+            <Button className={"hover:cursor-pointer"} type="button" variant="ghost" onClick={() => setOpen(false)} asChild>
               Cancel
             </Button>
 
@@ -148,7 +148,7 @@ const ProfileModal = ({ userData }: { userData: IUser }) => {
                     type="submit" 
                     disabled={!canSubmit || isPending}
                     className={"hover:cursor-pointer"}
-                    
+                    asChild
                 >
                   {isPending ? "Saving..." : "Save Changes"}
                 </Button>

@@ -19,9 +19,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const AdminTable = () => {
   
 
-const [selectedAdmin, setSelectedAdmin] = useState<UserDetails | null>(null);
+  const [selectedAdmin, setSelectedAdmin] = useState<UserDetails | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [role, setRole] = useState<string>("ALL"); // New role state
+  const [role, setRole] = useState<string>("ALL"); 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 

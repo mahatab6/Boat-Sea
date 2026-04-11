@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 
 import { httpClient } from "@/lib/axios/httpClient";
 import { ApiResponse } from "@/types/api.types";
+import { IRoute } from "@/types/route.types";
 import { UserDetails } from "@/types/user.types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const getAllAdmin = async (params: Record<string, any> = {}): Promise<ApiResponse<UserDetails[]>> => {
     try {
         const queryString = new URLSearchParams(params).toString();
@@ -19,3 +21,4 @@ export const getAllAdmin = async (params: Record<string, any> = {}): Promise<Api
         throw error;
     }
 }
+

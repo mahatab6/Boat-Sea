@@ -14,7 +14,7 @@ import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@
 
 import { useState } from "react";
 import { UserDetails } from "@/types/user.types";
-import { updateUserRole } from "@/app/(dashboardLayout)/dashboard/admin/admins-management/_actions";
+import { updateUserRole } from "@/app/(dashboardLayout)/dashboard/admin/user-management/_actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

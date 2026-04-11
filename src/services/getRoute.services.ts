@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 
 "use server";
@@ -6,18 +7,16 @@ import { httpClient } from "@/lib/axios/httpClient";
 import { ApiResponse } from "@/types/api.types";
 import { IRoute } from "@/types/route.types";
 
-export async function getRoute(): Promise<ApiResponse<IRoute[]>> {
-  try {
-    const response = await httpClient.get<IRoute[]>("/route");
-    return response; 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-
-
-    return {
-      success: false,
-      message: error.message || "An error occurred.",
-      data: [],
-    };
-  }
+export const getRoute = async (params: Record<string, any> = {}): Promise<ApiResponse<IRoute[]>> => {
+    try {
+        const queryString = new URLSearchParams(params).toString();
+        const url = `/route${queryString ? `?${queryString}` : ""}`;
+        
+        // If your httpClient is a standard Axios instance:
+        const response = await httpClient.get<IRoute[]>(url);
+        return response; 
+    } catch (error) {
+        
+        throw error;
+    }
 }
