@@ -47,10 +47,9 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
   // Form States
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [timeSlot, setTimeSlot] = useState("09:00");
   const [passengerInfo, setPassengerInfo] = useState({
-    name: "Md. Mahatab Hosen Raju", // Defaulting from your profile context
-    email: "hello@gmail.com",
+    name: "", // Defaulting from your profile context
+    email: "",
     phone: "",
     numberOfGuests: 1,
   });
@@ -182,21 +181,6 @@ const BookingFlow = ({ open, onClose, boat }: BookingFlowProps) => {
                     />
                   </PopoverContent>
                 </Popover>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Label>Preferred Boarding Time</Label>
-              <div className="grid grid-cols-4 gap-2">
-                {["09:00", "11:00", "13:00", "15:00"].map((t) => (
-                  <Button
-                    key={t}
-                    variant={timeSlot === t ? "default" : "outline"}
-                    onClick={() => setTimeSlot(t)}
-                    className="rounded-xl"
-                  >
-                    {t}
-                  </Button>
-                ))}
               </div>
             </div>
           </div>

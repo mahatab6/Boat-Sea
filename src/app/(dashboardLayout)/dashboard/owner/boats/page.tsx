@@ -2,15 +2,18 @@
 
 import { deleteBoatAction } from "@/components/modules/Dashboard/Boat-owner/BoatDeleteAction";
 import BoatFormModal from "@/components/modules/Dashboard/Boat-owner/BoatFormModal";
+import ScheduleModal from "@/components/modules/Dashboard/Boat-owner/ScheduleModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getMyboat } from "@/services/getMyboat.services";
+import { IBoat } from "@/types/boat.types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   Anchor,
+  Calendar,
   ChevronLeft,
   ChevronRight,
   Edit,
@@ -35,7 +38,9 @@ const MyBoatPage = () => {
 
   // Modal States
   const [formModalOpen, setFormModalOpen] = useState(false);
-
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [boat, setBoat] = useState<IBoat | null>(null);
+ 
 
  
   const { data: response, isLoading } = useQuery({
@@ -98,6 +103,10 @@ const MyBoatPage = () => {
 
   const openFormModal = () => {
     setFormModalOpen(true);
+  };
+  const openScheduleModal = (boat: IBoat) => {
+    setBoat(boat)
+    setScheduleModalOpen(true);
   };
 
 
@@ -167,7 +176,15 @@ const MyBoatPage = () => {
                 <h3 className="text-xl font-semibold mb-2">{boat.boatName}</h3>
                 <p className="text-primary font-bold mb-4">${boat.pricePerTrip} / Trip</p>
                 <div className="mt-auto flex gap-2 border-t pt-4">
-                  <Link href={`boats/edit/${boat.id}`}>
+
+                 
+                  <Button onClick={() => openScheduleModal(boat)} size="sm" variant="outline" className="flex-1 hover:cursor-pointer">
+                    <Calendar className="w-4 h-4 mr-2" /> add Schedule
+                  </Button>
+                 
+
+                  <div className="flex gap-2">
+                     <Link href={`boats/edit/${boat.id}`}>
                   <Button size="sm" variant="outline" className="flex-1 hover:cursor-pointer">
                      
                     <Edit className="w-4 h-4 mr-2" /> Edit
@@ -176,6 +193,7 @@ const MyBoatPage = () => {
                   <Button size="sm" variant="destructive" className="hover:cursor-pointer" onClick={() => handleDelete(boat.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -201,6 +219,13 @@ const MyBoatPage = () => {
         open={formModalOpen} 
         onClose={() => setFormModalOpen(false)} 
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ["get-my-boat"] })}
+      />
+
+      <ScheduleModal 
+        open={scheduleModalOpen} 
+        onClose={() => setScheduleModalOpen(false)} 
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["get-my-boat"] })}
+        boat={boat}
       />
     </div>
   );

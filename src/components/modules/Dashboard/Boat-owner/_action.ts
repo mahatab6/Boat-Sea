@@ -43,3 +43,22 @@ export const updateBoatAction = async (id: string, formData: FormData) => {
     };
   }
 };
+
+
+
+export const createScheduleAction = async (data: any) => {
+  try {
+    const res = await httpClient.post("/schedule", data);
+    revalidatePath("/dashboard/boats"); 
+    return {
+      success: true,
+      data: res.data,
+    };
+  } catch (error: any) {
+    console.error("Schedule Creation Error:", error.response?.data || error.message);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to create schedule",
+    };
+  }
+};

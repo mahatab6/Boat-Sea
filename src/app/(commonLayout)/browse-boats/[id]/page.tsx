@@ -16,10 +16,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import Image from "next/image";
-import { Label } from "@/components/ui/label";
 
+import Image from "next/image";
 import BookingFlow from "@/components/shared/bookingFlow";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
@@ -34,8 +32,6 @@ const amenityIcons: Record<string, any> = {
 
 const BoatDetailPage = () => {
   const { id } = useParams();
-
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   const { user }: any = useUser();
@@ -48,10 +44,7 @@ const BoatDetailPage = () => {
   });
   const boat = response as IBoat;
 
-  const bookedDates = [
-    new Date(new Date().setDate(new Date().getDate() + 1)),
-    new Date(new Date().setDate(new Date().getDate() + 5)),
-  ];
+  
 
   const handleBookNow = () => {
     if (!isAuthenticated) {
@@ -173,20 +166,6 @@ const BoatDetailPage = () => {
               <div className="text-4xl font-bold text-primary">
                 ${boat.pricePerTrip}
               </div>
-
-              <Label>Select Date</Label>
-
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                disabled={(d) =>
-                  d < new Date() ||
-                  bookedDates.some(
-                    (bd) => bd.toDateString() === d.toDateString(),
-                  )
-                }
-              />
 
               <div className="space-y-3 mt-4 text-sm text-gray-500">
                 <div className="flex gap-2">

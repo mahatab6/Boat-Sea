@@ -229,9 +229,8 @@ const BoatsListingPage = () => {
                       setSortBy(e.target.value);
                     }}
                   >
-                    <option value="rating">Top Rated</option>
-                    <option value="pricePerTrip">Price: Low to High</option>
-                    <option value="createdAt">Newest Arrival</option>
+                    <option value="pricePerTrip">Price: High to Low</option>
+                    <option value="createdAt">Price: Low to High</option>
                   </select>
                 </div>
               </div>
