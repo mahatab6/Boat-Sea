@@ -2,6 +2,8 @@
 "use server";
 
 import { httpClient } from "@/lib/axios/httpClient";
+import { ApiResponse } from "@/types/api.types";
+import { IReview } from "@/types/booking.types";
 
 export async function getBoatById(id: string) {
   try {
@@ -30,6 +32,26 @@ export async function getRouteById(id: string) {
     };
   }
 }
+
+export async function getReviewById(id: string): Promise<ApiResponse<IReview[]>> {
+  try {
+    const response = await httpClient.get<IReview[]>(`/reviews/${id}`);
+    return response;
+  } catch (error: any) {
+    throw error?.response?.data || error;
+  }
+}
+
+
+export async function getMYReview(): Promise<ApiResponse<IReview[]>> {
+  try {
+    const response = await httpClient.get<IReview[]>(`/reviews/my-review`);
+    return response;
+  } catch (error: any) {
+    throw error?.response?.data || error;
+  }
+}
+
 
 export async function bookingAndPayment(payload: any) {
   try {

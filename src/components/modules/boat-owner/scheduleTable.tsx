@@ -58,7 +58,6 @@ const ScheduleTable = () => {
         status: status === "ALL" ? undefined : status,
       }),
   });
-  console.log(scheduleResponse);
   const schedules = scheduleResponse?.data || [];
   const meta = scheduleResponse?.meta;
 

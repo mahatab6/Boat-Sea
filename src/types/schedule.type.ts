@@ -20,6 +20,9 @@ export interface ISchedule {
   createdAt: string;
   updatedAt: string;
   routeName?: string;
+  difficulty?: string;
+  distance?: string;
+  duration?: string;
   boat?: {
     boatName: string;
   };

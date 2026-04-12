@@ -49,11 +49,6 @@ export const ownerNavItems: NavSection[] = [
         icon: "Calendar",
       },
       {
-        title: "Earnings",
-        href: "/dashboard/owner/earnings",
-        icon: "Banknote",
-      },
-      {
         title: "Reviews",
         href: "/dashboard/owner/reviews",
         icon: "Star",
@@ -112,27 +107,13 @@ export const customerNavItems: NavSection[] = [
         icon: "Ticket",
       },
       {
-        title: "Wishlist",
-        href: "/dashboard/customer/wishlist",
-        icon: "Heart",
+        title: "My Reviews",
+        href: "/dashboard/customer/my-reviews",
+        icon: "Review",
       },
     ],
   },
-  {
-    title: "History",
-    items: [
-      {
-        title: "Rental History",
-        href: "/dashboard/customer/history",
-        icon: "History",
-      },
-      {
-        title: "Invoices",
-        href: "/dashboard/customer/invoices",
-        icon: "FileText",
-      },
-    ],
-  },
+ 
 ];
 
 

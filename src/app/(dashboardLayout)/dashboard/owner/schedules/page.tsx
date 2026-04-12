@@ -13,7 +13,7 @@ const schedulesPage = async () => {
         queryFn: getAllSchedule,
     })
   return (
-      <HydrationBoundary state={dehydrate(queryClient)}>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <ScheduleTable/>
     </HydrationBoundary>
   )

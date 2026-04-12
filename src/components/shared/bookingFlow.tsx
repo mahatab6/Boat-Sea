@@ -10,6 +10,8 @@ import {
   Ship,
   ArrowRight,
   ArrowLeft,
+  Clock,
+  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -23,6 +25,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
 import AnimatedModal from "./animatedModal";
 import { cn } from "@/lib/utils";
 import { UserInfo } from "@/types/user.types";
@@ -40,9 +45,9 @@ interface BookingFlowProps {
 
 const STEPS = [
   { id: 1, label: "Route" },
-  { id: 2, label: "Schedule" },
-  { id: 3, label: "Passengers" },
-  { id: 4, label: "Review" },
+  { id: 2, label: "Dates" },
+  { id: 3, label: "Guests" },
+  { id: 4, label: "Review & Pay" },
 ];
 
 const BookingFlow = ({
@@ -55,29 +60,29 @@ const BookingFlow = ({
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
-    null,
-  );
+  const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(null);
 
   // Form States
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [passengerInfo, setPassengerInfo] = useState({
-    name: user?.name,
-    email: user?.email,
+    name: user?.name || "",
+    email: user?.email || "",
     phone: "",
     numberOfGuests: 1,
   });
 
-  // Memoized Calculations
+  // Pricing Calculation
   const pricing = useMemo(() => {
     const days =
       startDate && endDate
         ? Math.max(1, differenceInDays(endDate, startDate))
         : 0;
+
     const basePrice = (boat?.pricePerTrip || 0) * days;
-    const tax = basePrice * 0.1;
-    const serviceFee = basePrice > 0 ? 50 : 0;
+    const tax = Math.round(basePrice * 0.1);
+    const serviceFee = days > 0 ? 50 : 0;
+
     return {
       days,
       basePrice,
@@ -88,24 +93,31 @@ const BookingFlow = ({
   }, [startDate, endDate, boat?.pricePerTrip]);
 
   const handleNext = () => {
-    if (step === 1 && !selectedSchedule)
-      return toast.error("Select a route first");
+    if (step === 1 && !selectedSchedule) {
+      return toast.error("Please select a route");
+    }
 
-    if (step === 2 && (!startDate || !endDate))
-      return toast.error("Select booking dates");
+    if (step === 2 && (!startDate || !endDate)) {
+      return toast.error("Please select both check-in and check-out dates");
+    }
 
     if (step === 3) {
-      if (!passengerInfo.phone) return toast.error("Phone number is required");
-
-      if (passengerInfo.numberOfGuests > (boat?.capacity || 1))
-        return toast.error("Exceeds boat capacity");
+      if (!passengerInfo.phone) {
+        return toast.error("Phone number is required");
+      }
+      if (passengerInfo.numberOfGuests > (boat?.capacity || 1)) {
+        return toast.error(`Maximum ${boat?.capacity} guests allowed`);
+      }
+      if (passengerInfo.numberOfGuests < 1) {
+        return toast.error("At least 1 guest is required");
+      }
     }
 
     setStep((s) => s + 1);
   };
 
   const handleSubmit = async () => {
-    if (!selectedSchedule || !startDate) {
+    if (!selectedSchedule || !startDate || !endDate) {
       return toast.error("Missing booking information");
     }
 
@@ -130,21 +142,17 @@ const BookingFlow = ({
 
     try {
       const response: any = await bookingAndPayment(bookingPayload);
-      toast.success("Redirecting to payment...");
-      window.location.assign(response.paymentUrl);
 
-      console.log("Payment URL:", response?.paymentUrl);
-
-      // if (response?.success && response?.paymentUrl) {
-      //   setLoading(false);
-      //   return;
-      // }
-
-      setLoading(false);
-      toast.error(response.message || "Failed to initiate payment");
+      if (response?.paymentUrl) {
+        toast.success("Redirecting to secure payment...");
+        window.location.assign(response.paymentUrl);
+      } else {
+        toast.error(response?.message || "Failed to initiate payment");
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
-      toast.error("Something went wrong");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -152,102 +160,144 @@ const BookingFlow = ({
     <AnimatedModal
       open={open}
       onOpenChange={onClose}
-      title={`Booking: ${boat?.boatName}`}
-      className="max-w-2xl"
+      title={`Book ${boat?.boatName}`}
+      className="max-w-2xl mx-4 sm:mx-auto"   // Better mobile padding
     >
-      {/* Step Indicator */}
-      <nav className="flex justify-between mb-10 relative">
-        <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-100 -z-10" />
-        {STEPS.map((s) => (
-          <div
-            key={s.id}
-            className="flex flex-col items-center gap-2 bg-white px-2"
-          >
-            <div
-              className={cn(
-                "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-500",
-                step >= s.id
-                  ? "bg-primary border-primary text-white"
-                  : "bg-white border-slate-200 text-slate-400",
-              )}
-            >
-              {step > s.id ? (
-                <Check className="w-5 h-5" />
-              ) : (
-                <span className="text-sm font-bold">{s.id}</span>
-              )}
+      {/* Progress Steps */}
+      <div className="mb-10">
+        <div className="flex justify-between relative">
+          <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200 dark:bg-slate-800 -z-10" />
+          
+          {STEPS.map((s, index) => (
+            <div key={s.id} className="flex flex-col items-center z-10">
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
+                  step >= s.id
+                    ? "bg-primary border-primary text-white shadow-md"
+                    : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-400"
+                )}
+              >
+                {step > s.id ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  <span className="font-semibold text-sm">{s.id}</span>
+                )}
+              </div>
+              <span
+                className={cn(
+                  "text-xs font-medium mt-2 tracking-wider",
+                  step >= s.id ? "text-primary" : "text-slate-500 dark:text-slate-400"
+                )}
+              >
+                {s.label}
+              </span>
             </div>
-            <span
-              className={cn(
-                "text-[10px] uppercase font-bold tracking-tighter",
-                step >= s.id ? "text-primary" : "text-slate-400",
-              )}
-            >
-              {s.label}
-            </span>
-          </div>
-        ))}
-      </nav>
+          ))}
+        </div>
+      </div>
 
-      <div className="min-h-350px">
+      <div className="min-h-[380px] pb-6">
+        {/* STEP 1: Route Selection */}
         {step === 1 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-            <Label>Select Route</Label>
+          <div className="space-y-6 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+            <div className="flex items-center gap-3">
+              <MapPin className="w-6 h-6 text-primary" />
+              <h3 className="text-xl font-semibold">Choose Your Route</h3>
+            </div>
 
-            <div className="grid gap-3">
-              {schedules?.map((schedule) => (
-                <button
-                  key={schedule.id}
-                  onClick={() => setSelectedSchedule(schedule)}
-                  className={cn(
-                    "border rounded-xl p-4 text-left transition",
-                    selectedSchedule?.id === schedule.id
-                      ? "border-primary bg-primary/5"
-                      : "hover:border-primary",
-                  )}
-                >
-                  <div className="font-semibold">🚢 {schedule.routeName}</div>
-
-                  <div className="text-xs text-muted-foreground">
-                    {schedule.departureTime} → {schedule.arrivalTime}
-                  </div>
-                </button>
-              ))}
+            <div className="grid gap-4">
+              {schedules?.length > 0 ? (
+                schedules.map((schedule) => (
+                  <Card
+                    key={schedule.id}
+                    className={cn(
+                      "cursor-pointer transition-all hover:shadow-md border-2",
+                      selectedSchedule?.id === schedule.id
+                        ? "border-primary bg-primary/5 dark:bg-primary/10"
+                        : "border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                    )}
+                    onClick={() => setSelectedSchedule(schedule)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-semibold text-lg">🚢 {schedule.routeName}</p>
+                          <div className="flex items-center gap-2 mt-2 text-sm text-slate-600 dark:text-slate-400">
+                            <Clock className="w-4 h-4" />
+                            {schedule.departureTime} → {schedule.arrivalTime}
+                          </div>
+                        </div>
+                        {selectedSchedule?.id === schedule.id && (
+                          <Check className="w-6 h-6 text-primary mt-1" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <p className="text-center py-12 text-slate-500">No routes available</p>
+              )}
             </div>
           </div>
         )}
 
+        {/* STEP 2: Dates */}
         {step === 2 && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-8 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+            <div className="flex items-center gap-3">
+              <CalendarIcon className="w-6 h-6 text-primary" />
+              <h3 className="text-xl font-semibold">Select Travel Dates</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>Check-in</Label>
+                <Label className="text-base">Check-in Date</Label>
                 <Popover>
-                  <PopoverTrigger className="inline-flex items-center justify-start gap-2 w-full px-3 py-2 text-sm border border-input rounded-xl h-12 bg-background hover:bg-accent hover:text-accent-foreground">
-                    <CalendarIcon className="h-4 w-4 text-primary" />
-                    {startDate ? format(startDate, "PPP") : "Pick Date"}
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-14 justify-start text-left font-normal rounded-2xl border-slate-300 dark:border-slate-700",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-3 h-5 w-5 text-primary" />
+                      {startDate ? format(startDate, "PPP") : "Select check-in date"}
+                    </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 rounded-2xl">
+                  <PopoverContent className="w-auto p-0 rounded-2xl" align="start">
                     <Calendar
                       mode="single"
                       selected={startDate}
                       onSelect={setStartDate}
+                      disabled={(date) => date < new Date()}
                     />
                   </PopoverContent>
                 </Popover>
               </div>
+
               <div className="space-y-2">
-                <Label>Check-out</Label>
+                <Label className="text-base">Check-out Date</Label>
                 <Popover>
-                  <PopoverTrigger className="inline-flex items-center justify-start gap-2 w-full px-3 py-2 text-sm border border-input rounded-xl h-12 bg-background hover:bg-accent hover:text-accent-foreground">
-                    <CalendarIcon className="h-4 w-4 text-primary" />
-                    {endDate ? format(endDate, "PPP") : "Pick Date"}
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-14 justify-start text-left font-normal rounded-2xl border-slate-300 dark:border-slate-700",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-3 h-5 w-5 text-primary" />
+                      {endDate ? format(endDate, "PPP") : "Select check-out date"}
+                    </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 rounded-2xl">
+                  <PopoverContent className="w-auto p-0 rounded-2xl" align="start">
                     <Calendar
                       mode="single"
                       selected={endDate}
                       onSelect={setEndDate}
+                      disabled={(date) => date <= (startDate || new Date())}
                     />
                   </PopoverContent>
                 </Popover>
@@ -256,145 +306,157 @@ const BookingFlow = ({
           </div>
         )}
 
+        {/* STEP 3: Passenger Info */}
         {step === 3 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-            <div className="p-4 bg-primary/5 rounded-2xl flex items-center gap-4 mb-4">
-              <Users className="text-primary" />
-              <p className="text-xs font-medium text-primary">
-                Guest list must not exceed {boat?.capacity} people.
-              </p>
+          <div className="space-y-8 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+            <div className="flex items-center gap-3">
+              <Users className="w-6 h-6 text-primary" />
+              <h3 className="text-xl font-semibold">Guest Information</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2 col-span-2">
-                <Label>Full Name</Label>
+
+            <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-sm text-amber-700 dark:text-amber-400">
+              Maximum capacity: <span className="font-semibold">{boat?.capacity} guests</span>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label>Full Name (Primary Guest)</Label>
                 <Input
                   value={passengerInfo.name}
-                  onChange={(e) =>
-                    setPassengerInfo({ ...passengerInfo, name: e.target.value })
-                  }
-                  className="rounded-xl h-12"
+                  onChange={(e) => setPassengerInfo({ ...passengerInfo, name: e.target.value })}
+                  className="h-14 rounded-2xl"
+                  placeholder="Enter full name"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Contact Phone</Label>
-                <Input
-                  type="tel"
-                  placeholder="+880..."
-                  value={passengerInfo.phone}
-                  onChange={(e) =>
-                    setPassengerInfo({
-                      ...passengerInfo,
-                      phone: e.target.value,
-                    })
-                  }
-                  className="rounded-xl h-12"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Guest Count</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={boat?.capacity}
-                  value={passengerInfo.numberOfGuests}
-                  onChange={(e) =>
-                    setPassengerInfo({
-                      ...passengerInfo,
-                      numberOfGuests: parseInt(e.target.value),
-                    })
-                  }
-                  className="rounded-xl h-12"
-                />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Phone Number</Label>
+                  <Input
+                    type="tel"
+                    placeholder="+880 1XXX-XXXXXX"
+                    value={passengerInfo.phone}
+                    onChange={(e) => setPassengerInfo({ ...passengerInfo, phone: e.target.value })}
+                    className="h-14 rounded-2xl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Number of Guests</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={boat?.capacity || 10}
+                    value={passengerInfo.numberOfGuests}
+                    onChange={(e) =>
+                      setPassengerInfo({
+                        ...passengerInfo,
+                        numberOfGuests: parseInt(e.target.value) || 1,
+                      })
+                    }
+                    className="h-14 rounded-2xl"
+                  />
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* STEP 3: REVIEW */}
+        {/* STEP 4: Review & Summary */}
         {step === 4 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-            <div className="border border-slate-100 rounded-3xl overflow-hidden bg-slate-50/50">
-              <div className="p-6 border-b border-white bg-white/40">
-                <h4 className="font-bold flex items-center gap-2">
-                  <Ship className="w-4 h-4" /> Voyage Details
-                </h4>
-                <div className="mt-4 grid grid-cols-2 gap-y-4 text-sm">
+          <div className="space-y-8 animate-in fade-in-50 slide-in-from-right-5 duration-300">
+            <div className="flex items-center gap-3">
+              <Ship className="w-6 h-6 text-primary" />
+              <h3 className="text-xl font-semibold">Booking Summary</h3>
+            </div>
+
+            <Card className="border-0 shadow-sm bg-slate-50 dark:bg-slate-900/70">
+              <CardContent className="p-8 space-y-8">
+                <div className="space-y-6">
                   <div>
-                    <p className="text-slate-400">Vessel</p>
-                    <p className="font-semibold">{boat?.boatName}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Vessel</p>
+                    <p className="font-semibold text-lg">{boat?.boatName}</p>
                   </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Route</p>
+                      <p className="font-medium">{selectedSchedule?.routeName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Duration</p>
+                      <p className="font-medium">{pricing.days} days</p>
+                    </div>
+                  </div>
+
                   <div>
-                    <p className="text-slate-400">Duration</p>
-                    <p className="font-semibold">{pricing.days} Days</p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-slate-400">Schedule</p>
-                    <p className="font-semibold">
-                      {format(startDate!, "MMM d")} —{" "}
-                      {format(endDate!, "MMM d")},
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Travel Period</p>
+                    <p className="font-medium">
+                      {startDate && endDate
+                        ? `${format(startDate, "MMMM d")} — ${format(endDate, "MMMM d, yyyy")}`
+                        : ""}
                     </p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-slate-400">Route</p>
-                  <p className="font-semibold">{selectedSchedule?.routeName}</p>
+
+                <Separator />
+
+                <div className="space-y-4 text-sm">
+                  <div className="flex justify-between">
+                    <span>Base Price</span>
+                    <span>${pricing.basePrice}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tax (10%)</span>
+                    <span>${pricing.tax}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Service & Docking Fee</span>
+                    <span>${pricing.serviceFee}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span>Total Amount</span>
+                    <span className="text-primary">${pricing.total}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="p-6 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Base Rate</span>
-                  <span>
-                    Boat price {boat?.pricePerTrip} * Days {pricing.days} = $
-                    {pricing.basePrice}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>${pricing.tax}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Service & Docking</span>
-                  <span>${pricing.serviceFee}</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg pt-4 border-t">
-                  <span>Total</span>
-                  <span className="text-primary">${pricing.total}</span>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>
 
-      {/* Footer Navigation */}
-      <footer className="flex gap-3 mt-10">
+      {/* Navigation Buttons */}
+      <div className="flex gap-4 pt-6 border-t border-slate-200 dark:border-slate-800 mt-auto">
         {step > 1 && (
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => setStep((s) => s - 1)}
-            className="rounded-xl flex-1 h-12"
+            className="h-14 rounded-2xl flex-1 text-base font-medium hover:cursor-pointer"
           >
-            <ArrowLeft className="mr-2 w-4 h-4" /> Back
+            <ArrowLeft className="mr-2 w-5 h-5" />
+            Back
           </Button>
         )}
+
         {step < STEPS.length ? (
           <Button
             onClick={handleNext}
-            className="rounded-xl flex-[2] h-12 group"
+            className="h-14 rounded-2xl flex-1 text-base font-semibold shadow-md hover:shadow-lg transition-all hover:cursor-pointer"
           >
-            Continue{" "}
-            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            Continue
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         ) : (
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="rounded-xl flex-2 h-12"
+            className="h-14 rounded-2xl flex-1 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:cursor-pointer"
           >
-            {loading ? "Processing..." : "Confirm & Pay"}
+            {loading ? "Processing Payment..." : `Pay $${pricing.total}`}
           </Button>
         )}
-      </footer>
+      </div>
     </AnimatedModal>
   );
 };

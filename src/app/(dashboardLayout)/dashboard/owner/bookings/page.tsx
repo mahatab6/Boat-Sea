@@ -1,10 +1,25 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import React from "react";
+import { getBookinRequest } from "./_action";
+import BookingRequestTable from "@/components/modules/boat-owner/BookingRequestTable";
 
-import React from 'react'
+const BookingRequestsPage = async () => {
+  const queryClient = new QueryClient();
 
-const BookingRequestsPage = () => {
+  await queryClient.prefetchQuery({
+    queryKey: ["getBookinRequest"],
+    queryFn: getBookinRequest,
+  });
+
   return (
-    <div>BookingRequestsPage</div>
-  )
-}
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <BookingRequestTable />
+    </HydrationBoundary>
+  );
+};
 
-export default BookingRequestsPage
+export default BookingRequestsPage;

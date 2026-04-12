@@ -14,6 +14,7 @@ import { MoreHorizontal, Loader2, ChevronLeft, ChevronRight } from "lucide-react
 interface DataTableAction<TData> {
   onView?: (data: TData) => void;
   onEdit?: (data: TData) => void;
+  onReview?: (data: TData) => void;
   onDelete?: (data: TData) => void;
 }
 
@@ -68,6 +69,11 @@ const DataTable = <TData,>({
                 {actions.onEdit && (
                   <DropdownMenuItem className={"hover:cursor-pointer"} onClick={() => actions.onEdit?.(rowData)}>
                     Edit
+                  </DropdownMenuItem>
+                )}
+                {actions.onReview && (
+                  <DropdownMenuItem className={"hover:cursor-pointer"} onClick={() => actions.onReview?.(rowData)}>
+                    Review
                   </DropdownMenuItem>
                 )}
                 {actions.onDelete && (

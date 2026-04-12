@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -10,6 +11,8 @@ import {
   Ship,
   Zap,
   Anchor,
+  SlidersHorizontal,
+  Badge,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
@@ -27,15 +31,8 @@ import { useSearchParams } from "next/navigation";
 
 const BoatsListingPage = () => {
   const searchParams = useSearchParams();
-
   const urlSearchTerm = searchParams.get("searchTerm") || "";
-  const urlCapacity = searchParams.get("capacity") || "";
-  const urlDate =  "";
-  /*
-  ========================
-  STATE
-  ========================
-  */
+
   const typeIcons: Record<string, React.ReactNode> = {
     SPEEDBOAT: <Zap className="w-4 h-4" />,
     FERRY: <Ship className="w-4 h-4" />,
@@ -45,292 +42,225 @@ const BoatsListingPage = () => {
   };
 
   const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
-
-  const debouncedSearch = searchTerm;
-
   const [page, setPage] = useState(1);
-
-  const [sortBy, setSortBy] = useState("rating");
+  const [sortBy, setSortBy] = useState("rating-desc");
 
   const [filters, setFilters] = useState({
-    priceRange: [0, 2000],
+    priceRange: [0, 2000] as [number, number],
     boatTypes: [] as string[],
     rating: 0,
-    capacity: urlCapacity || "",
-    date: urlDate || "",
+    capacity: "",
   });
 
-  /*
-  ========================
-  QUERY PARAM BUILDER
-  ========================
-  */
+  // Query Params
+  const queryParams = useMemo(() => {
+    const sortField = sortBy.includes("-") ? sortBy.split("-")[0] : sortBy;
+    const sortOrder = sortBy.includes("-") ? "desc" : "asc";
 
-const queryParams = useMemo(() => {
-  return {
-    searchTerm: searchTerm || undefined,
-    page,
-    limit: 10,
+    return {
+      searchTerm: searchTerm || undefined,
+      page,
+      limit: 12,
+      sortBy: sortField,
+      sortOrder,
+      "pricePerTrip[gte]": filters.priceRange[0],
+      "pricePerTrip[lte]": filters.priceRange[1],
+      "rating[gte]": filters.rating || undefined,
+      status: "AVAILABLE",
+      ...(filters.boatTypes.length > 0 && { boatType: filters.boatTypes.join(",") }),
+      ...(filters.capacity && { capacity: filters.capacity }),
+    };
+  }, [searchTerm, page, sortBy, filters]);
 
-    sortBy: sortBy.replace("-", ""),
-    sortOrder: sortBy.startsWith("-") ? "asc" : "desc",
-
-    "pricePerTrip[gte]": filters.priceRange[0],
-    "pricePerTrip[lte]": filters.priceRange[1],
-
-    "rating[gte]": filters.rating,
-
-    status: "AVAILABLE",
-
-    ...(filters.boatTypes.length > 0 && {
-      boatType: filters.boatTypes.join(","),
-    }),
-
-    ...(filters.capacity && {
-      capacity: filters.capacity,
-    }),
-
-    ...(filters.date && {
-      date: filters.date,
-    }),
-  };
-}, [searchTerm, page, sortBy, filters]);
-
- 
-
-  const {
-    data: response,
-    isLoading,
-    isPlaceholderData,
-  } = useQuery({
+  const { data: response, isLoading, isPlaceholderData } = useQuery({
     queryKey: ["boats", queryParams],
-
     queryFn: () => getAllBoats(queryParams),
-
     placeholderData: (prev) => prev,
   });
 
   const boats = response?.data ?? [];
-
   const meta = response?.meta;
 
-  /*
-  ========================
-  HANDLERS
-  ========================
-  */
-
+  // Handlers
   const handleTypeToggle = (type: string) => {
     setPage(1);
-
     setFilters((prev) => ({
       ...prev,
-
       boatTypes: prev.boatTypes.includes(type)
         ? prev.boatTypes.filter((t) => t !== type)
         : [...prev.boatTypes, type],
     }));
   };
 
-  const handlePriceChange = (val: number | readonly number[]) => {
+  const handlePriceChange = (val: number[]) => {
     setPage(1);
-
-    const priceArray = Array.isArray(val) ? val : [val];
-
-    setFilters((prev) => ({
-      ...prev,
-
-      priceRange: priceArray,
-    }));
+    setFilters((prev) => ({ ...prev, priceRange: val as [number, number] }));
   };
 
   const handleRatingChange = (star: number) => {
     setPage(1);
-
-    setFilters((prev) => ({
-      ...prev,
-
-      rating: prev.rating === star ? 0 : star,
-    }));
+    setFilters((prev) => ({ ...prev, rating: prev.rating === star ? 0 : star }));
   };
 
   const handleReset = () => {
     setFilters({
-  priceRange: [0, 2000],
-  boatTypes: [],
-  rating: 0,
-  capacity: "",
-  date: "",
-});
-
+      priceRange: [0, 2000],
+      boatTypes: [],
+      rating: 0,
+      capacity: "",
+    });
     setSearchTerm("");
-
     setPage(1);
+    setSortBy("rating-desc");
   };
 
+  const activeFilterCount =
+    filters.boatTypes.length + (filters.rating > 0 ? 1 : 0) + (filters.priceRange[0] > 0 || filters.priceRange[1] < 2000 ? 1 : 0);
 
   return (
-    <main className="min-h-screen bg-background pb-24">
-      {/* HEADER */}
+    <main className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-20">
+      {/* Hero Header */}
+      <div className="bg-gradient-to-br from-slate-950 to-slate-900 py-20 text-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-2xl">
+            <h1 className="font-serif text-5xl md:text-6xl font-bold leading-tight mb-4">
+              Discover Your <span className="italic text-primary">Perfect Vessel</span>
+            </h1>
+            <p className="text-slate-400 text-lg">
+              Explore premium boats and unforgettable water experiences
+            </p>
+          </div>
 
-      <div className="bg-slate-950 py-20 mb-12 text-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="font-serif text-5xl font-bold mb-6">
-            Find Your <span className="italic">Perfect Vessel</span>
-          </h1>
-
-          <div className="relative max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-
-            <Input
-              placeholder="Search by name, location or manufacturer..."
-              className="pl-12 h-14 bg-white/10 border-white/20 rounded-2xl"
-              value={searchTerm}
-              onChange={(e) => {
-                setPage(1);
-
-                setSearchTerm(e.target.value);
-              }}
-            />
+          {/* Search Bar */}
+          <div className="mt-10 max-w-2xl">
+            <div className="relative">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Input
+                placeholder="Search boats by name, location, or type..."
+                className="pl-14 h-16 bg-white/10 border-white/20 text-white placeholder:text-slate-400 text-lg rounded-3xl focus-visible:ring-primary"
+                value={searchTerm}
+                onChange={(e) => {
+                  setPage(1);
+                  setSearchTerm(e.target.value);
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* CONTENT */}
-
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-          {/* FILTER SIDEBAR */}
-
-          <aside className="lg:col-span-1">
-            <div className="bg-white dark:bg-zinc-950 rounded-3xl p-6 shadow-xl shadow-black/[0.03] border border-zinc-200 dark:border-zinc-800 sticky top-28 space-y-8">
-              {/* HEADER & SORT */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-bold text-2xl tracking-tight">Refine</h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleReset}
-                    className="text-muted-foreground hover:text-primary h-8 px-2"
-                  >
-                    <RotateCcw className="mr-2 w-3 h-3" />
-                    Reset
-                  </Button>
+      <div className="max-w-7xl mx-auto px-6 pt-12">
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Filter Sidebar */}
+          <aside className="lg:w-80 flex-shrink-0">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-slate-200 dark:border-slate-800 sticky top-8 space-y-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <SlidersHorizontal className="w-6 h-6 text-primary" />
+                  <h2 className="text-2xl font-bold tracking-tight">Filters</h2>
                 </div>
-
-                <div className="relative">
-                  <Label className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 block">
-                    Sort By
-                  </Label>
-                  <select
-                    value={sortBy}
-                    className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none appearance-none transition-all cursor-pointer"
-                    onChange={(e) => {
-                      setPage(1);
-                      setSortBy(e.target.value);
-                    }}
-                  >
-                    <option value="pricePerTrip">Price: High to Low</option>
-                    <option value="createdAt">Price: Low to High</option>
-                  </select>
-                </div>
+                {activeFilterCount > 0 && (
+                  <Badge  className="px-3 py-1">
+                    {activeFilterCount} active
+                  </Badge>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleReset}
+                  className="text-muted-foreground hover:text-red-500"
+                >
+                  <RotateCcw className="mr-2 w-4 h-4" />
+                  Reset
+                </Button>
               </div>
 
-              <hr className="border-zinc-100 dark:border-zinc-800" />
+              {/* Sort */}
+              <div>
+                <Label className="text-sm font-semibold text-muted-foreground mb-3 block">Sort By</Label>
+                <Select value={sortBy} onValueChange={setSortBy }>
+                  <SelectTrigger className="h-12 rounded-2xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rating-desc">Highest Rated</SelectItem>
+                    <SelectItem value="pricePerTrip-asc">Price: Low to High</SelectItem>
+                    <SelectItem value="pricePerTrip-desc">Price: High to Low</SelectItem>
+                    <SelectItem value="createdAt-desc">Newest First</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-              {/* PRICE RANGE */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-end">
-                  <Label className="font-semibold text-base">Price Range</Label>
+              {/* Price Range */}
+              <div>
+                <div className="flex justify-between items-end mb-4">
+                  <Label className="font-semibold">Price Range</Label>
                   <span className="text-sm font-medium text-primary">
-                    ${filters.priceRange[0]} — ${filters.priceRange[1] || 2000}
+                    ${filters.priceRange[0]} — ${filters.priceRange[1]}
                   </span>
                 </div>
                 <Slider
                   min={0}
                   max={2000}
-                  step={50}
+                  step={25}
                   value={filters.priceRange}
                   onValueChange={handlePriceChange}
-                  className="py-4"
+                  className="py-3"
                 />
               </div>
 
-              {/* RATING */}
-              <div className="space-y-3">
-                <Label className="font-semibold text-base">
-                  Minimum Rating
-                </Label>
-                <div className="grid grid-cols-3 gap-2">
+              {/* Minimum Rating */}
+              <div>
+                <Label className="font-semibold mb-4 block">Minimum Rating</Label>
+                <div className="flex gap-3">
                   {[4, 3, 2].map((star) => (
                     <button
                       key={star}
                       onClick={() => handleRatingChange(star)}
                       className={cn(
-                        "flex items-center justify-center gap-1 py-2 rounded-xl border text-sm font-medium transition-all",
+                        "flex-1 py-3 rounded-2xl border text-sm font-medium transition-all flex items-center justify-center gap-1.5",
                         filters.rating === star
-                          ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20"
-                          : "bg-transparent border-zinc-200 hover:border-zinc-400",
+                          ? "bg-primary text-white border-primary"
+                          : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                       )}
                     >
-                      {star}{" "}
-                      <Star
-                        className={cn(
-                          "w-3 h-3",
-                          filters.rating === star
-                            ? "fill-current"
-                            : "text-yellow-500",
-                        )}
-                      />
+                      {star} <Star className="w-4 h-4 fill-current" />
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* VESSEL TYPE */}
-              <div className="space-y-3">
-                <Label className="font-semibold text-base">Vessel Type</Label>
+              {/* Boat Types */}
+              <div>
+                <Label className="font-semibold mb-4 block">Vessel Type</Label>
                 <div className="space-y-2">
-                  {["SPEEDBOAT", "FERRY", "LAUNCH", "PRIVATE", "YACHT" ].map((type) => {
+                  {["SPEEDBOAT", "FERRY", "LAUNCH", "PRIVATE", "YACHT"].map((type) => {
                     const isSelected = filters.boatTypes.includes(type);
                     return (
                       <div
                         key={type}
                         onClick={() => handleTypeToggle(type)}
                         className={cn(
-                          "group flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900",
+                          "flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all",
                           isSelected
-                            ? "border-primary bg-primary/[0.02] ring-1 ring-primary/20"
-                            : "border-zinc-200 dark:border-zinc-800",
+                            ? "border-primary bg-primary/5 dark:bg-primary/10"
+                            : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"
                         )}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={cn(
-                              "p-2 rounded-lg transition-colors",
-                              isSelected
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500",
+                              "w-10 h-10 rounded-xl flex items-center justify-center",
+                              isSelected ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800"
                             )}
                           >
                             {typeIcons[type]}
                           </div>
-                          <span
-                            className={cn(
-                              "text-sm font-medium",
-                              isSelected
-                                ? "text-primary"
-                                : "text-zinc-700 dark:text-zinc-300",
-                            )}
-                          >
-                            {type}
-                          </span>
+                          <span className="font-medium text-sm capitalize">{type.toLowerCase()}</span>
                         </div>
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleTypeToggle(type)}
-                          className="rounded-full border-zinc-300 data-[state=checked]:bg-primary"
                         />
                       </div>
                     );
@@ -340,59 +270,76 @@ const queryParams = useMemo(() => {
             </div>
           </aside>
 
-          {/* RESULTS */}
-
-          <div className="lg:col-span-3">
-            {boats.length === 0 ? (
-              <div className="text-center py-16 bg-muted/30 rounded-2xl border border-dashed">
-                <p className="text-lg font-semibold mb-2">No vessels found.</p>
-                <p className="text-muted-foreground mb-6">
-                  Try changing your filters or search term.
+          {/* Results Section */}
+          <div className="flex-1">
+            {/* Results Header */}
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+                  Available Boats
+                </h2>
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
+                  {meta?.total || 0} vessels found
                 </p>
-                <Button onClick={handleReset}>Reset filters</Button>
+              </div>
+
+              {isLoading && (
+                <div className="text-sm text-muted-foreground">Loading boats...</div>
+              )}
+            </div>
+
+            {/* Boat Grid */}
+            {boats.length === 0 ? (
+              <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700">
+                <Ship className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-700 mb-6" />
+                <h3 className="text-2xl font-semibold mb-2">No boats found</h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                  We couldn't find any boats matching your current filters.
+                </p>
+                <Button onClick={handleReset} size="lg" className="rounded-2xl">
+                  Clear All Filters
+                </Button>
               </div>
             ) : (
-              <>
-                <div
-                  className={cn(
-                    "grid grid-cols-1 md:grid-cols-2 gap-8",
+              <div
+                className={cn(
+                  "grid grid-cols-1 md:grid-cols-2  gap-8",
+                  isPlaceholderData && "opacity-75 pointer-events-none"
+                )}
+              >
+                {boats.map((boat: IBoat) => (
+                  <BoatCard key={boat.id} boat={boat} />
+                ))}
+              </div>
+            )}
 
-                    isPlaceholderData && "opacity-50",
-                  )}
+            {/* Pagination */}
+            {meta && meta.totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-16">
+                <Button
+                  variant="outline"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="rounded-2xl px-6"
                 >
-                  {boats.map((boat: IBoat) => (
-                    <BoatCard key={boat.id} boat={boat} />
-                  ))}
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Previous
+                </Button>
+
+                <div className="px-6 py-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 font-medium">
+                  Page {page} of {meta.totalPages}
                 </div>
 
-                {meta && meta.totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-4 pt-6">
-                    <Button
-                      variant="outline"
-                      disabled={page <= 1}
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    >
-                      <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-                    </Button>
-
-                    <span className="text-sm font-semibold">
-                      Page {page} of {meta.totalPages}
-                    </span>
-
-                    <Button
-                      variant="outline"
-                      disabled={page >= meta.totalPages}
-                      onClick={() =>
-                        setPage((p) =>
-                          Math.min(meta.totalPages ?? p + 1, p + 1),
-                        )
-                      }
-                    >
-                      Next <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </div>
-                )}
-              </>
+                <Button
+                  variant="outline"
+                  disabled={page >= meta.totalPages}
+                  onClick={() => setPage((p) => Math.min(meta.totalPages ?? 1, p + 1))}
+                  className="rounded-2xl px-6"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
             )}
           </div>
         </div>
