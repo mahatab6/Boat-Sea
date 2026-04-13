@@ -21,6 +21,7 @@ interface BoatPieChartProps {
   description?: string;
 }
 
+
 const BoatPieChart = ({ 
   data, 
   title = "Booking Status", 

@@ -4,8 +4,19 @@ export interface ChartDataPoint {
 }
 
 export interface MonthlyBookingData {
-  month: string; // ISO Date string
+  month: string;
   count: number;
+  amount?: number;
+}
+
+export interface DayEarning {
+  createdAt: string; 
+  totalAmount: number;
+}
+
+interface LineChartData {
+  createdAt: string;
+  amount: number;
 }
 
 export interface DashboardData {
@@ -19,6 +30,8 @@ export interface DashboardData {
   totalSpent: number;
   piChartData: ChartDataPoint[];
   barChartData: MonthlyBookingData[];
+  areaChart: DayEarning[];
+  lineChart: LineChartData [];
 }
 
 export interface DashboardResponse {

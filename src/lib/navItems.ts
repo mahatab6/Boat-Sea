@@ -47,12 +47,7 @@ export const ownerNavItems: NavSection[] = [
         title: "Availability Calendar",
         href: "/dashboard/owner/schedules",
         icon: "Calendar",
-      },
-      {
-        title: "Reviews",
-        href: "/dashboard/owner/reviews",
-        icon: "Star",
-      },
+      }
     ],
   },
 ];
@@ -109,7 +104,7 @@ export const customerNavItems: NavSection[] = [
       {
         title: "My Reviews",
         href: "/dashboard/customer/my-reviews",
-        icon: "Review",
+        icon: "Star",
       },
     ],
   },
