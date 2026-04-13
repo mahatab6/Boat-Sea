@@ -13,6 +13,7 @@ import { toast } from "sonner"
 
 import { redirect } from "next/navigation"
 import logoutAction from "../auth/logoutAction"
+import Link from "next/link"
 
 
 
@@ -39,27 +40,28 @@ const UserDropdown = ({ userInfo }: Props) => {
   return (
     <DropdownMenu>
 
-      <DropdownMenuTrigger >
-        <Button variant="outline" size="icon" asChild>
-          <User className="w-5 h-5"/>
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger>
+  <Button variant="outline" size="icon" asChild className="cursor-pointer">
+    <User className="w-5 h-5" />
+  </Button>
+</DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
+<DropdownMenuContent align="end">
 
-        <DropdownMenuItem>
-          Profile
-        </DropdownMenuItem>
+  <Link href={"/dashboard/profile"}>
+    <DropdownMenuItem className="cursor-pointer">
+      Profile
+    </DropdownMenuItem>
+  </Link>
 
-        <DropdownMenuItem>
-          Settings
-        </DropdownMenuItem>
+  <DropdownMenuItem
+    className="cursor-pointer"
+    onClick={handleLogout}
+  >
+    Logout
+  </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => {handleLogout()}}>
-            Logout
-        </DropdownMenuItem>
-
-      </DropdownMenuContent>
+</DropdownMenuContent>
 
     </DropdownMenu>
   )

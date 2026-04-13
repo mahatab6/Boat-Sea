@@ -1,9 +1,9 @@
 "use client"
 
-import { NavSection } from "@/types/dashboardtypes"
 import DashboardMobileMenu from "./DashboardMobileMenu"
 import { UserInfo } from "@/types/user.types"
 import DashboardActions from "./DashboardActions"
+import { NavSection } from "@/types/dashboard.types"
 
 
 interface DashboardNavbarContentProps {

@@ -5,26 +5,26 @@ import * as React from "react";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {  Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "./toggle";
 import logoutAction from "../modules/auth/logoutAction";
 
 interface useActiveProps {
-  userActive: boolean
+  userActive: boolean;
 }
 
-const Navbar = ({userActive} : useActiveProps) => {
+const Navbar = ({ userActive }: useActiveProps) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isAuthenticated = userActive;
 
   const handleLogout = async () => {
-      const result = await logoutAction();
-      if (result.success) {
-        redirect("/");
-      }
+    const result = await logoutAction();
+    if (result.success) {
+      redirect("/");
+    }
   };
 
   const navLinks = [
@@ -75,20 +75,42 @@ const Navbar = ({userActive} : useActiveProps) => {
             <ModeToggle />
 
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                <Button variant="outline" className="rounded-full hover:cursor-pointer" asChild >
+              <div className="flex items-center gap-3">
+                {/* Dashboard Button */}
+                <Button
+                  variant="outline"
+                  className="rounded-full px-5 hover:bg-primary/5 hover:border-primary transition cursor-pointer"
+                  asChild
+                >
                   <Link href="/dashboard">Dashboard</Link>
+                </Button>
+
+                {/* Logout Button */}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="rounded-full px-5 text-destructive hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
+                >
+                  Logout
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link href="/login">
-                  <Button variant="ghost" className="rounded-full hover:cursor-pointer">
+                  <Button
+                    variant="ghost"
+                    className="rounded-full hover:cursor-pointer"
+                  >
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="rounded-full hover:cursor-pointer">Register</Button>
+                  <Button className="rounded-full hover:cursor-pointer">
+                    Register
+                  </Button>
                 </Link>
               </div>
             )}
@@ -141,7 +163,10 @@ const Navbar = ({userActive} : useActiveProps) => {
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Button variant="outline" className="w-full justify-start hover:cursor-pointer">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start hover:cursor-pointer"
+                    >
                       Dashboard
                     </Button>
                   </Link>
@@ -159,7 +184,10 @@ const Navbar = ({userActive} : useActiveProps) => {
               ) : (
                 <div className="flex flex-col space-y-2 px-4">
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start hover:cursor-pointer">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start hover:cursor-pointer"
+                    >
                       Login
                     </Button>
                   </Link>
@@ -167,7 +195,9 @@ const Navbar = ({userActive} : useActiveProps) => {
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Button className="w-full justify-start hover:cursor-pointer">Register</Button>
+                    <Button className="w-full justify-start hover:cursor-pointer">
+                      Register
+                    </Button>
                   </Link>
                 </div>
               )}

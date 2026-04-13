@@ -13,6 +13,7 @@ const FeaturedBoat = () => {
 
   const boats = response?.data ?? [];
 
+  console.log(response)
 
   return (
     <section className="py-24 bg-background">

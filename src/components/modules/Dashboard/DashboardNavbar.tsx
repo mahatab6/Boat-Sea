@@ -3,8 +3,9 @@ import { getDefaultDashboardRoute } from "@/lib/authUtils";
 import { getUserInfo } from "@/services/auth.services"
 
 import { getNavItemsByRole } from "@/lib/navItems";
-import { NavSection } from "@/types/dashboardtypes";
+
 import DashboardNavbarContent from "./DashboardNavbarContent";
+import { NavSection } from "@/types/dashboard.types";
 
 
 

@@ -73,11 +73,6 @@ export const adminNavItems: NavSection[] = [
         icon: "ClipboardList",
       },
       {
-        title: "Boat Verification",
-        href: "/dashboard/admin/boat-verification",
-        icon: "FileCheck",
-      },
-      {
         title: "Route Management",
         href: "/dashboard/admin/routes-management",
         icon: "Map",

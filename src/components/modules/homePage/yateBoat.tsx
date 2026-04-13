@@ -98,7 +98,7 @@ const YateBoat = () => {
               </div>
 
               {/* Decorative Elements */}
-              <div className="absolute -top-8 -left-8 w-28 h-28 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-white shadow-xl flex items-center justify-center z-10">
+              <div className="absolute -top-8 -left-8 w-28 h-28 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-white shadow-xl flex items-center justify-center z-50">
                 <div className="text-center">
                   <div className="text-4xl font-serif font-bold text-[#2d8a56]">10+</div>
                   <div className="text-xs tracking-widest uppercase text-slate-500">Yachts</div>

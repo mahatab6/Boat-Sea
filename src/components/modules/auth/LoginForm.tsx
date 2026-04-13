@@ -112,8 +112,9 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
               </form.Field>
 
               {/* Remember Me */}
-              <div className="flex items-center space-x-2 py-1">
-                <Checkbox
+              <div className="flex justify-between items-center space-x-2 py-1">
+                <div className="flex items-center space-x-2 py-1">
+                  <Checkbox
                   id="remember"
                   className="rounded-sm border-muted-foreground"
                 />
@@ -123,6 +124,16 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                 >
                   Remember me
                 </Label>
+                </div>
+
+                <Link href={"forgot-password"}>
+                  <Label
+                  htmlFor="remember"
+                  className="text-sm font-normal cursor-pointer text-muted-foreground select-none"
+                >
+                  Forgot password
+                </Label>
+                </Link>
               </div>
 
               {/* Server Error Alert */}
@@ -142,7 +153,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                     isPending={isSubmitting || isPending}
                     pendingLabel="Signing in..."
                     disabled={!canSubmit}
-                    className="h-11 text-base shadow-lg shadow-primary/20"
+                    className="h-11 text-base shadow-lg shadow-primary/20 hover:cursor-pointer"
                   >
                     Sign in
                   </FormSubmitButton>
@@ -166,7 +177,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
             <Button
               type="button"
               variant="outline"
-              className="w-full mt-6 h-11 hover:bg-muted/50 border-border transition-all duration-300"
+              className="w-full mt-6 h-11 hover:bg-muted/50 border-border transition-all duration-300 hover:cursor-pointer"
               onClick={handleGoogleLogin}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
