@@ -1,7 +1,18 @@
+"use client";
+
+import Lottie from "lottie-react";
+import boatAnimation from '../../public/Sailing boat.json'
+
 export default function GlobalLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+      <div className="w-64 h-64"> 
+        <Lottie 
+          animationData={boatAnimation} 
+          loop={true} 
+        />
+      </div>
+      <p className="text-muted-foreground animate-pulse">Loading adventure...</p>
     </div>
   );
 }

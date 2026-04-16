@@ -8,11 +8,7 @@ const CustomerPage = async () => {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["getMyBooking"],
-    queryFn: getMyBooking,
-  });
-
+ 
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

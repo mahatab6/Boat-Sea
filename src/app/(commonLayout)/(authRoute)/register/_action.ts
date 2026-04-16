@@ -2,6 +2,7 @@
 "use server";
 
 import { httpClient } from "@/lib/axios/httpClient";
+import { setTokenInCookies } from "@/lib/tokenUtils";
 import { ApiErrorResponse } from "@/types/api.types";
 import { IRegisterResponse, IRegisterResponseData } from "@/types/auth.types";
 import { IRegisterPayload, registerZodSchema } from "@/zod/auth.validation";
@@ -27,11 +28,15 @@ export const RegisterAction = async (
       parsedPayload.data
     );
 
-    const { user } = response.data;
+    const { accessToken , token , refreshToken, user } = response?.data 
+          await setTokenInCookies("accessToken",  accessToken);
+          await setTokenInCookies("refreshToken", refreshToken);
+      await setTokenInCookies("better-auth.session_token", token, 24 * 60 * 60); 
+          redirect('/')
 
-    if (!user.emailVerified) {
-      redirect(`/verify-email?email=${user.email}`);
-    }
+    // if (!user.emailVerified) {
+    //   redirect(`/verify-email?email=${user.email}`);
+    // }
 
     return response.data;
 

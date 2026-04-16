@@ -4,7 +4,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { getIconComponent } from "@/lib/iconMapper";
 import { cn } from "@/lib/utils";
-import { NavSection } from "@/types/dashboardtypes";
+import { NavSection } from "@/types/dashboard.types";
+
 import { UserInfo } from "@/types/user.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "./toggle";
 import logoutAction from "../modules/auth/logoutAction";
+import { toast } from "sonner";
 
 interface useActiveProps {
   userActive: boolean;
@@ -23,6 +24,7 @@ const Navbar = ({ userActive }: useActiveProps) => {
   const handleLogout = async () => {
     const result = await logoutAction();
     if (result.success) {
+      toast.success("Logged out successfully");
       redirect("/");
     }
   };

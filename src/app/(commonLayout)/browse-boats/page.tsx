@@ -43,10 +43,10 @@ const BoatsListingPage = () => {
 
   const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState("rating-desc");
+  const [sortBy, setSortBy] = useState("rating-desc" );
 
   const [filters, setFilters] = useState({
-    priceRange: [0, 2000] as [number, number],
+    priceRange: [0, 10000] as [number, number],
     boatTypes: [] as string[],
     rating: 0,
     capacity: "",
@@ -54,8 +54,9 @@ const BoatsListingPage = () => {
 
   // Query Params
   const queryParams = useMemo(() => {
-    const sortField = sortBy.includes("-") ? sortBy.split("-")[0] : sortBy;
-    const sortOrder = sortBy.includes("-") ? "desc" : "asc";
+    const [sortField, sortOrder] = sortBy.includes("-") 
+      ? sortBy.split("-") 
+      : [sortBy, "asc"];
 
     return {
       searchTerm: searchTerm || undefined,
@@ -104,7 +105,7 @@ const BoatsListingPage = () => {
 
   const handleReset = () => {
     setFilters({
-      priceRange: [0, 2000],
+      priceRange: [0, 10000],
       boatTypes: [],
       rating: 0,
       capacity: "",
@@ -115,7 +116,7 @@ const BoatsListingPage = () => {
   };
 
   const activeFilterCount =
-    filters.boatTypes.length + (filters.rating > 0 ? 1 : 0) + (filters.priceRange[0] > 0 || filters.priceRange[1] < 2000 ? 1 : 0);
+    filters.boatTypes.length + (filters.rating > 0 ? 1 : 0) + (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000 ? 1 : 0);
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-20">
@@ -168,7 +169,7 @@ const BoatsListingPage = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleReset}
-                  className="text-muted-foreground hover:text-red-500"
+                  className="text-muted-foreground hover:text-red-500 hover:cursor-pointer"
                 >
                   <RotateCcw className="mr-2 w-4 h-4" />
                   Reset
@@ -178,15 +179,15 @@ const BoatsListingPage = () => {
               {/* Sort */}
               <div>
                 <Label className="text-sm font-semibold text-muted-foreground mb-3 block">Sort By</Label>
-                <Select value={sortBy} onValueChange={setSortBy }>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value || "")}>
                   <SelectTrigger className="h-12 rounded-2xl">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="rating-desc">Highest Rated</SelectItem>
+          
                     <SelectItem value="pricePerTrip-asc">Price: Low to High</SelectItem>
                     <SelectItem value="pricePerTrip-desc">Price: High to Low</SelectItem>
-                    <SelectItem value="createdAt-desc">Newest First</SelectItem>
+                    
                   </SelectContent>
                 </Select>
               </div>
@@ -201,10 +202,10 @@ const BoatsListingPage = () => {
                 </div>
                 <Slider
                   min={0}
-                  max={2000}
+                  max={10000}
                   step={25}
                   value={filters.priceRange}
-                  onValueChange={handlePriceChange}
+                 onValueChange={(val) => handlePriceChange(val as number[])}
                   className="py-3"
                 />
               </div>

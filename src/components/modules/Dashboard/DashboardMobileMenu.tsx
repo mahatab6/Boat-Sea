@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { useState } from "react"
-import { NavSection } from "@/types/dashboardtypes"
+
 import DashboardMobileSidebar from "./DashboardMobileSidebar"
 import { UserInfo } from "@/types/user.types"
+import { NavSection } from "@/types/dashboard.types"
 
 interface Props {
   userInfo: UserInfo

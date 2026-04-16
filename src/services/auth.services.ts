@@ -3,16 +3,19 @@
 import { setTokenInCookies } from "@/lib/tokenUtils";
 import { cookies } from "next/headers";
 
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-if (!BASE_API_URL) {
-  throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined");
+function getBaseUrl(): string {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined");
+  }
+  return baseUrl;
 }
 
 export async function getNewTokensWithRefreshToken(
   refreshToken: string,
 ): Promise<boolean> {
   try {
+    const BASE_API_URL = getBaseUrl();
     const res = await fetch(`${BASE_API_URL}/auth/refresh-token`, {
       method: "POST",
       headers: {
@@ -48,6 +51,7 @@ export async function getNewTokensWithRefreshToken(
 
 export async function getUserInfo() {
   try {
+    const BASE_API_URL = getBaseUrl();
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value;
     const sessionToken = cookieStore.get("better-auth.session_token")?.value;

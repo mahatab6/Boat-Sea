@@ -10,7 +10,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const route = getDefaultDashboardRoute(user.role);
+  const route = getDefaultDashboardRoute(user?.role);
 
   redirect(route);
 }

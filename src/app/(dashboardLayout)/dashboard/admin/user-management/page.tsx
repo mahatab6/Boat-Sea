@@ -2,7 +2,6 @@
 
 
 import AdminTable from '@/components/modules/admin/adminTable';
-import { getAllAdmin } from '@/services/getAdmin.services';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import React from 'react'
 
@@ -10,10 +9,6 @@ const AdminsManagementPage = async () => {
 
     const queryClient = new QueryClient();
 
-      await queryClient.prefetchQuery({
-        queryKey: ['getAllAdmin'],
-        queryFn: getAllAdmin,
-    })
 
   return (
      <HydrationBoundary state={dehydrate(queryClient)}>

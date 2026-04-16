@@ -1,36 +1,252 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚤 Boat Sea – Full Stack Boat Booking Platform
 
-## Getting Started
+Boat Sea is a **full‑stack boat booking web application** where **boat owners can list their boats**, **customers can book trips**, and **admins manage the entire system** through a centralized dashboard.
 
-First, run the development server:
+This project is built using a modern **Next.js + Express + Prisma + PostgreSQL + Stripe** stack and follows production‑level architecture practices.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+# 🌐 Live Links
+
+### Frontend
+
+[https://boat-sea.vercel.app/](https://boat-sea.vercel.app/)
+
+### Backend API
+
+[https://boat-backend-indol.vercel.app/](https://boat-backend-indol.vercel.app/)
+
+### Frontend Repository
+
+[https://github.com/mahatab6/Boat-Sea](https://github.com/mahatab6/Boat-Sea)
+
+### Backend Repository
+
+[https://github.com/mahatab6/Boat-Sea-Backend](https://github.com/mahatab6/Boat-Sea-Backend)
+
+---
+
+# 📌 Project Overview
+
+Boat Sea allows three main user roles:
+
+### 👤 Customer
+
+- Register/Login securely
+- Browse available boats
+- View boat details
+- Select travel schedule
+- Book boats
+- Make secure payments
+- Manage bookings
+
+### 🚤 Boat Owner
+
+- Add boats
+- Update boat details
+- Upload boat images
+- Set pricing
+- Track bookings
+
+### 🛠️ Admin
+
+- Manage users
+- Manage boats
+- Monitor bookings
+- Control platform data
+- Manage approval workflows
+
+---
+
+# 🧱 Tech Stack
+
+## Frontend
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- ShadCN UI
+- TanStack Query
+- TanStack Table
+- TanStack Form
+- Axios
+- Zod Validation
+- Framer Motion Animations
+- GSAP Animations
+- React Icons
+- Swiper Slider
+- Lottie Animations
+- Recharts
+- Next Themes
+- Sonner Toast
+
+---
+
+## Backend
+
+- Express.js v5
+- TypeScript
+- Prisma ORM
+- PostgreSQL (Neon DB)
+- Better Auth
+- JWT Authentication
+- Stripe Payment Integration
+- Cloudinary File Upload
+- Nodemailer Email Service
+- PDFKit Invoice Generator
+- Multer File Upload
+- Zod Validation
+- Resend Email API
+
+---
+
+# 🔐 Authentication Features
+
+- Email & Password Login
+- Secure JWT Token System
+- Cookie-based authentication
+- Role-based access control
+
+---
+
+# 💳 Payment System
+
+Integrated with **Stripe**:
+
+Features:
+
+- Secure checkout session
+- Booking payment flow
+- Payment verification
+- Webhook support
+- Invoice generation (PDF)
+
+---
+
+# 📦 Core Application Features
+
+### Boat Management
+
+- Add boat
+- Update boat
+- Delete boat
+- Upload boat images
+- Availability status tracking
+
+### Booking System
+
+- Select schedule
+- Choose travel date
+- Real-time booking flow
+- Payment integration
+- Booking history tracking
+
+### Dashboard System
+
+Role-based dashboards:
+
+- Admin Dashboard
+- Owner Dashboard
+- Customer Dashboard
+
+Each dashboard provides controlled access based on permissions.
+
+# 🧪 Environment Variables
+
+## Frontend (.env.local)
+
+```
+follow env example
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Backend (.env)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+follow env example
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# ⚙️ Installation Guide
 
-To learn more about Next.js, take a look at the following resources:
+## Clone Frontend
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+git clone https://github.com/mahatab6/Boat-Sea.git
+cd Boat-Sea
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Clone Backend
 
-## Deploy on Vercel
+```
+git clone https://github.com/mahatab6/Boat-Sea-Backend.git
+cd Boat-Sea-Backend
+npm install
+npx prisma generate
+npx prisma db push
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 📊 Database Design
+
+Database built using **Prisma ORM** with PostgreSQL.
+
+Core entities:
+
+- User
+- Boat
+- Booking
+- Payment
+- Schedule
+- Role
+
+Designed with scalable relational architecture.
+
+---
+
+# ☁️ Deployment
+
+Frontend deployed on:
+
+Vercel
+
+Backend deployed on:
+
+Vercel Serverless Functions
+
+Database hosted on:
+
+Neon PostgreSQL
+
+Media storage:
+
+Cloudinary
+
+---
+
+# 🚀 Future Improvements
+
+Planned upgrades:
+
+- Notification system
+- Real-time booking updates
+- Chat between owner & customer
+- Advanced analytics dashboard
+- Mobile app version
+
+---
+
+# 👨‍💻 Author
+
+MahAtab
+
+Full Stack Developer (MERN + Next.js)
+
+GitHub:
+
+[https://github.com/mahatab6](https://github.com/mahatab6)

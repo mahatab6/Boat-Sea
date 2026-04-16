@@ -1,4 +1,8 @@
-export type UserRole = "SUPER_ADMIN" | "ADMIN" | "BOAT_OWNER" | "CUSTOMER";
+export type UserRole =
+  | "SUPER_ADMIN"
+  | "ADMIN"
+  | "BOAT_OWNER"
+  | "CUSTOMER";
 
 export const authRoutes = [
   "/login",
@@ -8,98 +12,56 @@ export const authRoutes = [
   "/verify-email",
 ];
 
-export const isAuthRoute = (pathname: string) => {
-  return authRoutes.includes(pathname);
-};
+export const isAuthRoute = (pathname: string) =>
+  authRoutes.includes(pathname);
 
 export type RouteConfig = {
   exact: string[];
   pattern: RegExp[];
 };
 
-/**
- * 1. COMMON ROUTES
- * Accessible by any authenticated user
- */
+// COMMON
 export const commonProtectedRoutes: RouteConfig = {
-  exact: [
-    "/dashboard/profile", 
-    "/dashboard/change-password"
-  ],
-  pattern: [/^\/dashboard$/], // Matches the base dashboard landing
+  exact: ["/dashboard/profile", "/dashboard/change-password"],
+  pattern: [/^\/dashboard$/],
 };
 
-/**
- * 2. ADMIN & SUPER_ADMIN ROUTES
- * Matches all paths starting with /dashboard/admin
- */
+// ADMIN
 export const adminProtectedRoutes: RouteConfig = {
   exact: [],
-  pattern: [
-    /^\/dashboard\/admin(\/.*)?$/ 
-  ],
+  pattern: [/^\/dashboard\/admin(\/.*)?$/],
 };
 
-/**
- * 3. BOAT OWNER ROUTES
- * Matches all paths starting with /dashboard/owner
- */
+// OWNER
 export const ownerProtectedRoutes: RouteConfig = {
   exact: [],
-  pattern: [
-    /^\/dashboard\/owner(\/.*)?$/
-  ],
+  pattern: [/^\/dashboard\/owner(\/.*)?$/],
 };
 
-/**
- * 4. CUSTOMER ROUTES
- * Matches all paths starting with /dashboard/customer
- */
+// CUSTOMER
 export const customerProtectedRoutes: RouteConfig = {
   exact: ["/payment/success"],
-  pattern: [
-    /^\/dashboard\/customer(\/.*)?$/
-  ],
+  pattern: [/^\/dashboard\/customer(\/.*)?$/],
 };
 
-/**
- * Helper to check if a pathname matches a RouteConfig
- */
 export const isRouteMatches = (pathname: string, routes: RouteConfig) => {
-  if (routes.exact.includes(pathname)) {
-    return true;
-  }
-  return routes.pattern.some((pattern: RegExp) => pattern.test(pathname));
+  return (
+    routes.exact.includes(pathname) ||
+    routes.pattern.some((p) => p.test(pathname))
+  );
 };
 
-/**
- * Identifies the intended audience of a specific URL
- */
 export const getRouteOwner = (
-  pathname: string,
+  pathname: string
 ): "ADMIN" | "BOAT_OWNER" | "CUSTOMER" | "COMMON" | null => {
-  if (isRouteMatches(pathname, adminProtectedRoutes)) {
-    return "ADMIN";
-  }
-
-  if (isRouteMatches(pathname, ownerProtectedRoutes)) {
-    return "BOAT_OWNER";
-  }
-
-  if (isRouteMatches(pathname, customerProtectedRoutes)) {
-    return "CUSTOMER";
-  }
-
-  if (isRouteMatches(pathname, commonProtectedRoutes)) {
-    return "COMMON";
-  }
+  if (isRouteMatches(pathname, adminProtectedRoutes)) return "ADMIN";
+  if (isRouteMatches(pathname, ownerProtectedRoutes)) return "BOAT_OWNER";
+  if (isRouteMatches(pathname, customerProtectedRoutes)) return "CUSTOMER";
+  if (isRouteMatches(pathname, commonProtectedRoutes)) return "COMMON";
 
   return null;
 };
 
-/**
- * Returns the default landing page after login based on role
- */
 export const getDefaultDashboardRoute = (role: UserRole): string => {
   switch (role) {
     case "SUPER_ADMIN":
@@ -114,19 +76,31 @@ export const getDefaultDashboardRoute = (role: UserRole): string => {
   }
 };
 
+export const isValidRedirectForRole = (pathname: string, role: UserRole): boolean => {
+  const routeOwner = getRouteOwner(pathname);
 
-export const isValidRedirectForRole = (
-  redirectPath: string,
-  role: UserRole,
-): boolean => {
- 
-  const effectiveRole = role === "SUPER_ADMIN" ? "ADMIN" : role;
-  
-  const routeOwner = getRouteOwner(redirectPath);
-
-  if (routeOwner === null || routeOwner === "COMMON") {
+  if (routeOwner === null) {
+    // Public routes are valid for any role
     return true;
   }
- 
-  return routeOwner === effectiveRole;
+
+  if (routeOwner === "COMMON") {
+    // Common routes are valid for any authenticated user
+    return true;
+  }
+
+  // Check if the role matches the route owner
+  if (routeOwner === "ADMIN") {
+    return role === "SUPER_ADMIN" || role === "ADMIN";
+  }
+
+  if (routeOwner === "BOAT_OWNER") {
+    return role === "BOAT_OWNER";
+  }
+
+  if (routeOwner === "CUSTOMER") {
+    return role === "CUSTOMER";
+  }
+
+  return false;
 };

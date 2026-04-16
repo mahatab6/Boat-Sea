@@ -16,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import { User, Mail, Lock, Anchor } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const RegisterForm = () => {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ const RegisterForm = () => {
       name: "",
       email: "",
       password: "",
-      role: "CUSTOMER"
+      role: "CUSTOMER",
     },
     onSubmit: async ({ value }) => {
       if (!acceptedTerms) {
@@ -40,9 +41,9 @@ const RegisterForm = () => {
 
       setServerError(null);
       try {
-    
-        const result = (await mutateAsync(value)) as any;
+        const result = (await mutateAsync(value as IRegisterPayload)) as any;
         if (result.success) {
+          toast.success("Registration successfully");
           setServerError(null);
           // Typically redirect happens in action or via window.location here
           return;
@@ -63,10 +64,10 @@ const RegisterForm = () => {
     return { label: "Strong", color: "bg-emerald-500" };
   };
 
-  const handleGoogleSignup = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    window.location.href = `${baseUrl}/auth/login/google`;
-  };
+  // const handleGoogleSignup = () => {
+  //   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  //   window.location.href = `${baseUrl}/auth/login/google`;
+  // };
 
   return (
     <main className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 md:p-8 bg-background">
@@ -163,54 +164,62 @@ const RegisterForm = () => {
                 }}
               </form.Field>
 
-                {/* Role Selection Toggle */}
-<form.Field
-  name="role"
-  validators={{ onChange: registerZodSchema.shape.role }}
->
-  {(field) => (
-    <div className="space-y-3 mb-6">
-      <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-        I want to...
-      </Label>
-      <div className="grid grid-cols-2 gap-4">
-        <Button
-          type="button"
-          variant={field.state.value === "CUSTOMER" ? "default" : "outline"}
-          onClick={() => field.handleChange("CUSTOMER")}
-          className={cn(
-            "h-12 rounded-xl transition-all duration-300 hover:cursor-pointer",
-            field.state.value === "CUSTOMER" 
-              ? "shadow-md shadow-primary/20 scale-[1.02]" 
-              : "hover:bg-muted"
-          )}
-        >
-          <User className="w-4 h-4 mr-2" />
-          Book a Boat
-        </Button>
-        <Button
-          type="button"
-          variant={field.state.value === "BOAT_OWNER" ? "default" : "outline"}
-          onClick={() => field.handleChange("BOAT_OWNER")}
-          className={cn(
-            "h-12 rounded-xl transition-all duration-300 hover:cursor-pointer",
-            field.state.value === "BOAT_OWNER" 
-              ? "shadow-md shadow-primary/20 scale-[1.02]" 
-              : "hover:bg-muted"
-          )}
-        >
-          <Anchor className="w-4 h-4 mr-2" />
-          List my Boat
-        </Button>
-      </div>
-      {field.state.meta.errors && (
-        <p className="text-[10px] text-destructive font-medium">
-          {field.state.meta.errors.join(", ")}
-        </p>
-      )}
-    </div>
-  )}
-</form.Field>
+              {/* Role Selection Toggle */}
+              <form.Field
+                name="role"
+                validators={{ onChange: registerZodSchema.shape.role }}
+              >
+                {(field) => (
+                  <div className="space-y-3 mb-6">
+                    <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                      I want to...
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant={
+                          field.state.value === "CUSTOMER"
+                            ? "default"
+                            : "outline"
+                        }
+                        onClick={() => field.handleChange("CUSTOMER")}
+                        className={cn(
+                          "h-12 rounded-xl transition-all duration-300 hover:cursor-pointer",
+                          field.state.value === "CUSTOMER"
+                            ? "shadow-md shadow-primary/20 scale-[1.02]"
+                            : "hover:bg-muted",
+                        )}
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Book a Boat
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={
+                          field.state.value === "BOAT_OWNER"
+                            ? "default"
+                            : "outline"
+                        }
+                        onClick={() => field.handleChange("BOAT_OWNER")}
+                        className={cn(
+                          "h-12 rounded-xl transition-all duration-300 hover:cursor-pointer",
+                          field.state.value === "BOAT_OWNER"
+                            ? "shadow-md shadow-primary/20 scale-[1.02]"
+                            : "hover:bg-muted",
+                        )}
+                      >
+                        <Anchor className="w-4 h-4 mr-2" />
+                        List my Boat
+                      </Button>
+                    </div>
+                    {field.state.meta.errors && (
+                      <p className="text-[10px] text-destructive font-medium">
+                        {field.state.meta.errors.join(", ")}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
 
               {/* Terms and Conditions */}
               <div className="flex items-start space-x-2 pt-2">
@@ -276,7 +285,7 @@ const RegisterForm = () => {
               </div>
             </div>
 
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full mt-6 h-11 border-border hover:bg-muted/50 transition-all hover:cursor-pointer"
@@ -301,7 +310,7 @@ const RegisterForm = () => {
                 />
               </svg>
               Google
-            </Button>
+            </Button> */}
           </CardContent>
         </Card>
 

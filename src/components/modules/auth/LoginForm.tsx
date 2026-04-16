@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { LoginAction } from "@/app/(commonLayout)/(authRoute)/login/_action";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 interface LoginFormProps {
   redirectPath?: string;
@@ -37,8 +38,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
         const result = (await mutateAsync(value)) as any;
         if (result.success) {
           setServerError(null);
-          // Redirect logic usually happens inside the action,
-          // but you can add a toast here if needed
+          toast.success("login successfully")
           return;
         } else {
           setServerError(result.message || "Invalid credentials");
@@ -51,10 +51,10 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
     },
   });
 
-  const handleGoogleLogin = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    window.location.href = `${baseUrl}/auth/login/google`;
-  };
+  // const handleGoogleLogin = () => {
+  //   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  //   window.location.href = `${baseUrl}/auth/login/google`;
+  // };
 
   return (
     <main className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 md:p-8 bg-background">
@@ -174,7 +174,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
             </div>
 
             {/* Google Login Button */}
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full mt-6 h-11 hover:bg-muted/50 border-border transition-all duration-300 hover:cursor-pointer"
@@ -199,7 +199,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                 />
               </svg>
               Google
-            </Button>
+            </Button> */}
           </CardContent>
         </Card>
 

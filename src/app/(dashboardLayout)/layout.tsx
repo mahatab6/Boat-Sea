@@ -1,13 +1,20 @@
 
-
+import { redirect } from "next/navigation";
 import DashboardNavbar from "@/components/modules/Dashboard/DashboardNavbar"
 import DashboardSidebar from "@/components/modules/Dashboard/DashboardSidebar"
+import { getUserInfo } from "@/services/auth.services";
 
 
 import React from "react"
 
+export const dynamic = 'force-dynamic';
 
 const RootDashboardLayout = async ({children} : {children: React.ReactNode}) => {
+  const userInfo = await getUserInfo();
+  
+  if (!userInfo) {
+    redirect('/login');
+  }
   return (
     <div className="flex h-screen overflow-hidden">
         {/* Dashboard sidebar */}

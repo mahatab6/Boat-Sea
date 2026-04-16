@@ -254,7 +254,7 @@ const BookingFlow = ({
               <div className="space-y-2">
                 <Label className="text-base">Check-in Date</Label>
                 <Popover>
-                  <PopoverTrigger asChild>
+                  <PopoverTrigger >
                     <Button
                       variant="outline"
                       className={cn(
@@ -280,7 +280,7 @@ const BookingFlow = ({
               <div className="space-y-2">
                 <Label className="text-base">Check-out Date</Label>
                 <Popover>
-                  <PopoverTrigger asChild>
+                  <PopoverTrigger >
                     <Button
                       variant="outline"
                       className={cn(

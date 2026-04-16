@@ -2,11 +2,13 @@ import { ApiResponse } from "@/types/api.types";
 import axios from "axios";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.API_BASE_URL;
-
-if (!API_BASE_URL) {
-  throw new Error("Base url not defined");
-}
+const getApiBaseUrl = () => {
+  const baseUrl = process.env.BASE_URL;
+  if (!baseUrl) {
+    throw new Error("Base url not defined");
+  }
+  return baseUrl;
+};
 
 const axiosInstance = async () => {
   const cookieStore = await cookies();
@@ -16,7 +18,7 @@ const axiosInstance = async () => {
     .join("; ");
 
   const instance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: getApiBaseUrl(),
     timeout: 30000,
     headers: {
       Cookie: cookieHeader,

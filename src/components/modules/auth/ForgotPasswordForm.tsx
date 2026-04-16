@@ -13,15 +13,16 @@ import FormSubmitButton from "@/components/shared/form/formSubmitButtont";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ForgotPasswordAction } from "@/app/(commonLayout)/(authRoute)/forgot-password/_action";
+
 
 const ForgotPasswordForm = () => {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: (email: string) => ForgotPasswordAction(email),
-  });
+  // const { mutateAsync, isPending } = useMutation({
+  //   mutationFn: (email: string) => 
+  //     ForgotPasswordAction(email),
+  // });
 
   const form = useForm({
     defaultValues: {
@@ -29,18 +30,18 @@ const ForgotPasswordForm = () => {
     },
     onSubmit: async ({ value }) => {
       setServerError(null);
-      try {
-        const result = await mutateAsync(value.email);
+      // try {
+      //   const result = await mutateAsync(value.email);
 
-        if (result.success) {
-          setIsSuccess(true);
-          setServerError(null);
-        } else {
-          setServerError(result.message || "Something went wrong");
-        }
-      } catch (error: any) {
-        setServerError("An unexpected error occurred. Please try again.");
-      }
+      //   if (result.success) {
+      //     setIsSuccess(true);
+      //     setServerError(null);
+      //   } else {
+      //     setServerError(result.message || "Something went wrong");
+      //   }
+      // } catch (error: any) {
+      //   setServerError("An unexpected error occurred. Please try again.");
+      // }
     },
   });
 
@@ -114,7 +115,7 @@ const ForgotPasswordForm = () => {
                 >
                   {([canSubmit, isSubmitting]) => (
                     <FormSubmitButton
-                      isPending={isSubmitting || isPending}
+                      // isPending={isSubmitting || isPending}
                       pendingLabel="Sending link..."
                       disabled={!canSubmit}
                       className="h-11 text-base shadow-lg shadow-primary/20"

@@ -27,6 +27,9 @@ export interface IRegisterResponseData {
   success: boolean;
   message: string;
   user: IUser;
+    accessToken: string;
+  refreshToken: string;
+  token: string;
 }
 
 export interface IUser {
