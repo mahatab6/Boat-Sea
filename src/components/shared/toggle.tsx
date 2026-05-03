@@ -3,57 +3,31 @@
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-
-import { buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
+  // Function to toggle between light and dark
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
-    <DropdownMenu>
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggleTheme}
+      className="relative hover:cursor-pointer rounded-full border-gray-200 dark:border-slate-800 transition-colors"
+      title="Toggle Theme"
+    >
+      {/* Sun icon: Visible in light mode, hidden in dark */}
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
 
-      <DropdownMenuTrigger
-        className={`${buttonVariants({
-          variant: "outline",
-          size: "icon",
-        })} cursor-pointer`}
-      >
-        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      {/* Moon icon: Hidden in light mode, visible in dark */}
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400" />
 
-        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-
-        <span className="sr-only">Toggle theme</span>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => setTheme("light")}
-        >
-          Light
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => setTheme("dark")}
-        >
-          Dark
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => setTheme("system")}
-        >
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-
-    </DropdownMenu>
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
 }
