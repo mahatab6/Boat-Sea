@@ -11,6 +11,7 @@ import Statistics from "./statistics";
 import LatestBlogs from "./latestBlogs";
 import FAQ from "./faq";
 import Newsletter from "./newsletter";
+import ScrollToTop from "./scrollToTop";
 
 const HomePage = () => {
   return (
@@ -27,6 +28,7 @@ const HomePage = () => {
       <LatestBlogs/>
       <FAQ/>
       <Newsletter/>
+      <ScrollToTop/>
     </main>
   );
 };
