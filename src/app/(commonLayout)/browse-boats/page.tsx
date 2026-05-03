@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
 import BoatCard from "@/components/shared/BoatCard";
+import BoatCardSkeleton from "@/components/shared/BoatCardSkeleton";
 import { getAllBoats } from "@/services/getAllBoat.services";
 import { IBoat } from "@/types/boat.types";
 import { useSearchParams } from "next/navigation";
@@ -284,13 +285,16 @@ const BoatsListingPage = () => {
                 </p>
               </div>
 
-              {isLoading && (
-                <div className="text-sm text-muted-foreground">Loading boats...</div>
-              )}
             </div>
 
             {/* Boat Grid */}
-            {boats.length === 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <BoatCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : boats.length === 0 ? (
               <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700">
                 <Ship className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-700 mb-6" />
                 <h3 className="text-2xl font-semibold mb-2">No boats found</h3>
@@ -304,7 +308,7 @@ const BoatsListingPage = () => {
             ) : (
               <div
                 className={cn(
-                  "grid grid-cols-1 md:grid-cols-2  gap-8",
+                  "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
                   isPlaceholderData && "opacity-75 pointer-events-none"
                 )}
               >
