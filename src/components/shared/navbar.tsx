@@ -5,11 +5,21 @@ import * as React from "react";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "./toggle";
 import logoutAction from "../modules/auth/logoutAction";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface useActiveProps {
   userActive: boolean;
@@ -61,11 +71,10 @@ const Navbar = ({ userActive }: useActiveProps) => {
               <Link
                 key={link.path}
                 href={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isActive(link.path)
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/80 hover:text-foreground hover:bg-muted"
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive(link.path)
+                  ? "text-primary bg-primary/10"
+                  : "text-foreground/80 hover:text-foreground hover:bg-muted"
+                  }`}
               >
                 {link.name}
               </Link>
@@ -78,26 +87,54 @@ const Navbar = ({ userActive }: useActiveProps) => {
 
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                {/* Dashboard Button */}
-                <Button
-                  variant="outline"
-                  className="rounded-full px-5 hover:bg-primary/5 hover:border-primary transition cursor-pointer"
-                  asChild
-                >
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
 
-                {/* Logout Button */}
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="rounded-full px-5 text-destructive hover:text-destructive hover:bg-destructive/10 transition cursor-pointer"
-                >
-                  Logout
-                </Button>
+
+                {/* Profile Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="relative flex items-center justify-center h-10 w-10 rounded-full hover:cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-none bg-transparent p-0">
+                    <Avatar className="h-10 w-10 border border-gray-200 dark:border-slate-700">
+                      <AvatarImage src="" alt="User" />
+                      <AvatarFallback className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground">
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mt-2" align="end">
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">Account</p>
+                          <p className="text-xs leading-none text-muted-foreground">Manage your settings</p>
+                        </div>
+                      </DropdownMenuLabel>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="hover:cursor-pointer p-0">
+                      <Link href="/dashboard" className="flex items-center w-full px-1.5 py-1">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:cursor-pointer p-0">
+                      <Link href="/dashboard/profile" className="flex items-center w-full px-1.5 py-1">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Manage Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="hover:cursor-pointer"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
@@ -146,11 +183,10 @@ const Navbar = ({ userActive }: useActiveProps) => {
                   key={link.path}
                   href={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                    isActive(link.path)
-                      ? "text-primary bg-primary/10"
-                      : "text-foreground/80 hover:bg-muted"
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium ${isActive(link.path)
+                    ? "text-primary bg-primary/10"
+                    : "text-foreground/80 hover:bg-muted"
+                    }`}
                 >
                   {link.name}
                 </Link>
