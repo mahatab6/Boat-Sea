@@ -2,6 +2,7 @@ import Footer from "@/components/shared/footer";
 import Navbar from "@/components/shared/navbar";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { getUserInfo } from "@/services/auth.services";
+import ChatbotWidget from "@/components/modules/chatbot/ChatbotWidget";
 
 
 export default async function CommonLayout({
@@ -26,6 +27,7 @@ export default async function CommonLayout({
           {children}
         </main>
         <Footer/>
+        <ChatbotWidget />
       </div>
     </ThemeProvider>
   );
