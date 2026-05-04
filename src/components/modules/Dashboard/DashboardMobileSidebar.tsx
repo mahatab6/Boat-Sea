@@ -32,9 +32,9 @@ const DashboardMobileSidebar = ({
     */
     <div className="flex h-screen flex-col overflow-hidden bg-background">
       {/* Header - Fixed */}
-      <div className="flex h-16 shrink-0 items-center border-b px-6">
-        <Link href={dashboardHome} onClick={() => setOpen?.(false)}>
-          <span className="text-xl font-bold text-primary">HealthCare</span>
+      <div className="flex h-14 shrink-0 items-center border-b px-6">
+        <Link href={dashboardHome} onClick={() => setOpen?.(false)} className="flex items-center gap-2">
+          <span className="text-xl font-bold text-primary tracking-tight">Boat Sea</span>
         </Link>
       </div>
       

@@ -171,11 +171,11 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                   </span>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Button 
+                <Button
                   type="button"
-                  variant="outline" 
+                  variant="outline"
                   size="sm"
                   className="text-[10px] h-8 border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
                   onClick={() => {
@@ -185,9 +185,9 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                 >
                   Admin
                 </Button>
-                <Button 
+                <Button
                   type="button"
-                  variant="outline" 
+                  variant="outline"
                   size="sm"
                   className="text-[10px] h-8 border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
                   onClick={() => {
@@ -197,9 +197,9 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                 >
                   Boat Owner
                 </Button>
-                <Button 
+                <Button
                   type="button"
-                  variant="outline" 
+                  variant="outline"
                   size="sm"
                   className="text-[10px] h-8 border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
                   onClick={() => {
@@ -224,8 +224,8 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
               </div>
             </div>
 
-            {/* Social Login Section */}
-            <GoogleLogin />
+            {/* Social Login Section
+            <GoogleLogin /> */}
           </CardContent>
         </Card>
 

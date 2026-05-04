@@ -283,7 +283,7 @@ const RegisterForm = () => {
             </div>
 
             {/* Social Login Section */}
-            <GoogleLogin />
+            {/* <GoogleLogin /> */}
           </CardContent>
         </Card>
 

@@ -25,9 +25,9 @@ const DashboardSidebarContent = ({
   return (
     <div className="hidden md:flex h-full w-64 flex-col border-r bg-card overflow-y-auto">
       {/* Logo / Brand */}
-      <div className="flex h-13.5 items-center border-b px-6">
-        <Link href={dashboardHome}>
-          <span className="text-xl font-bold text-primary">Boat Sea</span>
+      <div className="flex h-14 items-center border-b px-6">
+        <Link href={dashboardHome} className="flex items-center gap-2">
+          <span className="text-xl font-bold text-primary tracking-tight">Boat Sea</span>
         </Link>
       </div>
 
@@ -52,7 +52,7 @@ const DashboardSidebarContent = ({
                       href={item.href}
                       key={id}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer",
                         isActive
                           ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",

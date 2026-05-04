@@ -21,11 +21,16 @@ const DashboardMobileMenu = ({ userInfo, navItems, dashboardHome }: Props) => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger 
-        render={
-          <Button variant="outline" size="icon" className="md:hidden">
+        render={(props) => (
+          <Button 
+            {...props}
+            variant="outline" 
+            size="icon" 
+            className="md:hidden cursor-pointer"
+          >
             <Menu className="h-5 w-5"/>
           </Button>
-        }
+        )}
       />
 
       <SheetContent side="left" className="w-72 p-0 h-full"> 
