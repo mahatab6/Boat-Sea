@@ -66,7 +66,8 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
           </p>
         </div>
 
-        <Card className="border-none shadow-2xl bg-card">
+        <Card className="border-none shadow-2xl bg-card/80 backdrop-blur-xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
           <CardContent className="p-8">
             <form
               onSubmit={(e) => {
@@ -125,8 +126,8 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
 
                 <Link href={"forgot-password"}>
                   <Label
-                    htmlFor="remember"
-                    className="text-sm font-normal cursor-pointer text-muted-foreground select-none"
+                    htmlFor="forgot"
+                    className="text-sm font-normal cursor-pointer text-muted-foreground select-none hover:text-primary transition-colors"
                   >
                     Forgot password
                   </Label>
@@ -150,13 +151,66 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
                     isPending={isSubmitting || isPending}
                     pendingLabel="Signing in..."
                     disabled={!canSubmit}
-                    className="h-11 text-base shadow-lg shadow-primary/20 hover:cursor-pointer"
+                    className="h-12 text-base shadow-lg shadow-primary/20 hover:cursor-pointer w-full bg-primary hover:bg-primary/90 transition-all active:scale-[0.98]"
                   >
                     Sign in
                   </FormSubmitButton>
                 )}
               </form.Subscribe>
             </form>
+
+            {/* Demo Login Buttons */}
+            <div className="mt-8 space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-3 text-muted-foreground tracking-widest font-medium">
+                    Demo Credentials
+                  </span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="sm"
+                  className="text-[10px] h-8 border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => {
+                    form.setFieldValue("email", "admin@gmail.com");
+                    form.setFieldValue("password", "admin@#1234");
+                  }}
+                >
+                  Admin
+                </Button>
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="sm"
+                  className="text-[10px] h-8 border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => {
+                    form.setFieldValue("email", "nodoy78327@sskaid.com");
+                    form.setFieldValue("password", "12345678");
+                  }}
+                >
+                  Boat Owner
+                </Button>
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="sm"
+                  className="text-[10px] h-8 border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => {
+                    form.setFieldValue("email", "customer@gmail.com");
+                    form.setFieldValue("password", "customer@#1234");
+                  }}
+                >
+                  Customer
+                </Button>
+              </div>
+            </div>
 
             {/* Divider */}
             <div className="mt-8 relative">
@@ -177,7 +231,7 @@ const LoginForm = ({ redirectPath }: LoginFormProps) => {
 
         {/* Footer Link */}
         <p className="text-center text-sm text-muted-foreground">
-          Donot have an account?{" "}
+          Don't have an account?{" "}
           <Link
             href="/register"
             className="text-primary font-bold hover:underline transition-all"
